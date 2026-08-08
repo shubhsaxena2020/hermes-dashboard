@@ -1,0 +1,85 @@
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { BadgeVariant, StatusResponse } from '@/lib/api'
+
+function certBadgeVariant(daysRemaining?: number): BadgeVariant {
+  if (daysRemaining == null) return 'destructive'
+  if (daysRemaining < 14) return 'destructive'
+  if (daysRemaining < 30) return 'secondary'
+  return 'outline'
+}
+
+export function OverviewSection({ data }: { data: StatusResponse }) {
+  const oracleUp = data.oracle.containers.filter((c) => c.up).length
+  const oracleTotal = data.oracle.containers.length
+
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-semibold">Overview</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardTitle className="text-base">VPS</CardTitle>
+            <Badge>always on</Badge>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              {oracleUp}/{oracleTotal} containers up
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Quick links</CardTitle>
+          </CardHeader>
+          <CardContent className="space-x-4 text-sm">
+            <a className="text-primary underline" href="https://portainer.shubhbuilds.com" target="_blank" rel="noreferrer">
+              Portainer
+            </a>
+            <a className="text-primary underline" href="https://monitor.shubhbuilds.com" target="_blank" rel="noreferrer">
+              Netdata
+            </a>
+          </CardContent>
+        </Card>
+
+        <Card className="sm:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-base">TLS certificates</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+              {(data.tls || []).map((cert) => (
+                <div key={cert.domain} className="flex items-center justify-between gap-2 rounded-md border px-3 py-2">
+                  <dt className="truncate text-muted-foreground">{cert.domain.replace('.shubhbuilds.com', '')}</dt>
+                  <dd>
+                    <Badge variant={cert.error ? 'destructive' : certBadgeVariant(cert.daysRemaining)}>
+                      {cert.error ? 'error' : `${cert.daysRemaining}d`}
+                    </Badge>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </CardContent>
+        </Card>
+
+        <Card className="sm:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-base">Estimated cost</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">
+                VPS ({data.costs?.main.machineType ?? '?'}, always on)
+              </span>
+              <span>{data.costs?.main.monthlyEstimate != null ? `~$${data.costs.main.monthlyEstimate}/mo` : '—'}</span>
+            </div>
+            <p className="text-xs text-muted-foreground pt-1">
+              Approximate on-demand list pricing, not a billing-accurate figure.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,15 @@
+{
+  "name": "vps-control",
+  "version": "1.0.0",
+  "description": "Dashboard to monitor and control the VPS",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-basic-auth": "^1.2.1"
+  }
+}

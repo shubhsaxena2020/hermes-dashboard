@@ -1,0 +1,229 @@
+import { Fragment, useState } from 'react'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import type { BadgeVariant, ContainerInfo } from '@/lib/api'
+
+interface Props {
+  containers: ContainerInfo[]
+  controllable: string[]
+  viewable?: string[] // omit to allow viewing logs for every container
+  onAction: (name: string, action: 'start' | 'stop' | 'restart') => Promise<void>
+  onLogs: (name: string) => Promise<string[]>
+}
+
+// Docker's `stats --format` output, e.g. "27.19%" and "3.42GiB / 7.75GiB" --
+// parsed client-side purely to flag containers worth a second look.
+function parseCpuPercent(cpu?: string): number | null {
+  if (!cpu) return null
+  const n = parseFloat(cpu)
+  return Number.isNaN(n) ? null : n
+}
+
+const MEM_UNIT_BYTES: Record<string, number> = { B: 1, KiB: 1024, MiB: 1024 ** 2, GiB: 1024 ** 3, TiB: 1024 ** 4 }
+
+function parseMemBytes(part: string): number | null {
+  const m = part.trim().match(/^([\d.]+)\s*(B|KiB|MiB|GiB|TiB)$/)
+  if (!m) return null
+  return parseFloat(m[1]) * MEM_UNIT_BYTES[m[2]]
+}
+
+// mem is "<used> / <total-host-memory>" -- there's no per-container limit set
+// on these containers, so this is really "% of host RAM," which is still a
+// useful signal for "this one container is eating the box."
+function parseMemPercent(mem?: string): number | null {
+  if (!mem) return null
+  const [usedStr, totalStr] = mem.split('/')
+  if (!usedStr || !totalStr) return null
+  const used = parseMemBytes(usedStr)
+  const total = parseMemBytes(totalStr)
+  if (used == null || !total) return null
+  return (used / total) * 100
+}
+
+function resourceBadgeVariant(pct: number | null): BadgeVariant | null {
+  if (pct == null) return null
+  if (pct >= 80) return 'destructive'
+  if (pct >= 50) return 'secondary'
+  return null
+}
+
+export function ContainerTable({ containers, controllable, viewable, onAction, onLogs }: Props) {
+  const [openLogs, setOpenLogs] = useState<Record<string, string[] | 'loading'>>({})
+  const [pending, setPending] = useState<Record<string, boolean>>({})
+  const [confirmTarget, setConfirmTarget] = useState<{ name: string; action: 'stop' | 'restart' } | null>(null)
+  const [logFilter, setLogFilter] = useState<Record<string, string>>({})
+
+  async function runAction(name: string, action: 'start' | 'stop' | 'restart') {
+    setPending((p) => ({ ...p, [name]: true }))
+    try {
+      await onAction(name, action)
+      toast.success(`${name}: ${action} succeeded`)
+    } catch (err) {
+      toast.error(`${name}: ${action} failed`, { description: (err as Error).message })
+    } finally {
+      setPending((p) => ({ ...p, [name]: false }))
+    }
+  }
+
+  async function toggleLogs(name: string) {
+    if (openLogs[name]) {
+      setOpenLogs((o) => {
+        const next = { ...o }
+        delete next[name]
+        return next
+      })
+      return
+    }
+    setOpenLogs((o) => ({ ...o, [name]: 'loading' }))
+    try {
+      const logs = await onLogs(name)
+      setOpenLogs((o) => ({ ...o, [name]: logs }))
+    } catch (err) {
+      setOpenLogs((o) => ({ ...o, [name]: [`Failed to load logs: ${(err as Error).message}`] }))
+    }
+  }
+
+  return (
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Container</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {containers.map((c) => {
+            const canControl = controllable.includes(c.name)
+            const canView = !viewable || viewable.includes(c.name)
+            const isPending = pending[c.name]
+            const logState = openLogs[c.name]
+            const filter = logFilter[c.name] || ''
+            const filteredLines =
+              Array.isArray(logState) && filter
+                ? logState.filter((line) => line.toLowerCase().includes(filter.toLowerCase()))
+                : logState
+            const cpuPct = parseCpuPercent(c.cpu)
+            const memPct = parseMemPercent(c.mem)
+            const resourceVariant = resourceBadgeVariant(Math.max(cpuPct ?? 0, memPct ?? 0))
+            return (
+              <Fragment key={c.name}>
+                <TableRow>
+                  <TableCell>
+                    <div className="font-medium flex items-center gap-2">
+                      {c.name}
+                      {resourceVariant && (
+                        <Badge variant={resourceVariant} className="text-[10px] px-1.5 py-0">
+                          high usage
+                        </Badge>
+                      )}
+                    </div>
+                    {(c.cpu || c.mem) && (
+                      <div className="text-xs text-muted-foreground">
+                        {c.cpu} {c.mem ? `· ${c.mem}` : ''}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <span className={c.up ? 'text-green-500' : 'text-red-500'}>{c.status}</span>
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    {canControl && !c.up && (
+                      <Button size="sm" variant="default" disabled={isPending} onClick={() => runAction(c.name, 'start')}>
+                        Start
+                      </Button>
+                    )}
+                    {canControl && c.up && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          disabled={isPending}
+                          onClick={() => setConfirmTarget({ name: c.name, action: 'stop' })}
+                        >
+                          Stop
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          disabled={isPending}
+                          onClick={() => setConfirmTarget({ name: c.name, action: 'restart' })}
+                        >
+                          Restart
+                        </Button>
+                      </>
+                    )}
+                    {canView && (
+                      <Button size="sm" variant="outline" onClick={() => toggleLogs(c.name)}>
+                        {logState ? 'Hide logs' : 'Logs'}
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+                {logState && (
+                  <TableRow>
+                    <TableCell colSpan={3} className="p-0">
+                      <div className="m-2 space-y-2">
+                        {Array.isArray(logState) && (
+                          <Input
+                            placeholder="Filter log lines…"
+                            value={filter}
+                            onChange={(e) => setLogFilter((f) => ({ ...f, [c.name]: e.target.value }))}
+                            className="h-7 text-xs max-w-xs"
+                          />
+                        )}
+                        <pre className="bg-muted/50 text-xs p-3 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md">
+                          {logState === 'loading'
+                            ? 'Loading…'
+                            : (filteredLines as string[]).join('\n') || (filter ? '(no matching lines)' : '(no output)')}
+                        </pre>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </Fragment>
+            )
+          })}
+        </TableBody>
+      </Table>
+
+      <AlertDialog open={!!confirmTarget} onOpenChange={(open) => !open && setConfirmTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmTarget?.action === 'stop' ? 'Stop' : 'Restart'} {confirmTarget?.name}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will {confirmTarget?.action} the container immediately.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmTarget) runAction(confirmTarget.name, confirmTarget.action)
+                setConfirmTarget(null)
+              }}
+            >
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
+}

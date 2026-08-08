@@ -1,0 +1,7 @@
+control.shubhbuilds.com {
+    basic_auth {
+        shubh $2a$14$jjJrA6Gh/99WNIskKryWo.E.9/XL.SJLKhw77u0sJX7nX1O/KEIZ6
+    }
+    reverse_proxy vps-control:4000
+    encode gzip zstd
+}
