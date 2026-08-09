@@ -3,14 +3,14 @@ import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import type { BadgeVariant, HardwareUsage, StatusResponse } from '@/lib/api'
-import { progressIndicatorClass } from '@/lib/color-threshold'
+import { progressIndicatorClass, TLS_CRITICAL_DAYS, TLS_EXPIRING_SOON_DAYS } from '@/lib/color-threshold'
 import { formatUptime } from '@/lib/time'
 import { ExternalLink } from 'lucide-react'
 
 function certBadgeVariant(daysRemaining?: number): BadgeVariant {
   if (daysRemaining == null) return 'destructive'
-  if (daysRemaining < 14) return 'destructive'
-  if (daysRemaining < 30) return 'secondary'
+  if (daysRemaining < TLS_CRITICAL_DAYS) return 'destructive'
+  if (daysRemaining < TLS_EXPIRING_SOON_DAYS) return 'secondary'
   return 'outline'
 }
 
@@ -106,7 +106,7 @@ export function OverviewSection({ data }: { data: StatusResponse }) {
             {(() => {
               const certs = data.tls || []
               const errored = certs.filter((c) => c.error).length
-              const expiringSoon = certs.filter((c) => !c.error && (c.daysRemaining ?? Infinity) < 30).length
+              const expiringSoon = certs.filter((c) => !c.error && (c.daysRemaining ?? Infinity) < TLS_EXPIRING_SOON_DAYS).length
               const healthy = certs.length - errored - expiringSoon
               if (certs.length === 0) return null
               const label = errored > 0
