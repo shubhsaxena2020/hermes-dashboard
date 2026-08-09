@@ -63,6 +63,7 @@ async function getHardwareUsage() {
     diskTotal: diskParts[1] || null,
     diskUsed: diskParts[2] || null,
     diskPct: diskParts[4] || null,
+    uptimeSeconds: Math.floor(os.uptime()),
   }
 }
 

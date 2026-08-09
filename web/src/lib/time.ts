@@ -1,3 +1,14 @@
+/** Format a duration in seconds as a human-readable uptime string. */
+export function formatUptime(seconds: number | null): string {
+  if (seconds == null || seconds < 0) return '—'
+  const d = Math.floor(seconds / 86400)
+  const h = Math.floor((seconds % 86400) / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  if (d > 0) return `${d}d ${h}h`
+  if (h > 0) return `${h}h ${m}m`
+  return `${m}m`
+}
+
 export function timeAgo(ts: number | null): string {
   if (!ts) return ''
   const secs = Math.floor((Date.now() - ts) / 1000)

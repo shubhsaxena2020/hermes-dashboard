@@ -14,6 +14,7 @@ export interface HardwareUsage {
   diskTotal: string | null
   diskUsed: string | null
   diskPct: string | null
+  uptimeSeconds: number | null
 }
 
 export type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'

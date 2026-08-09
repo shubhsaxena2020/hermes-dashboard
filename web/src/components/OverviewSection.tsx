@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import type { BadgeVariant, HardwareUsage, StatusResponse } from '@/lib/api'
 import { progressIndicatorClass } from '@/lib/color-threshold'
+import { formatUptime } from '@/lib/time'
 import { ExternalLink } from 'lucide-react'
 
 function certBadgeVariant(daysRemaining?: number): BadgeVariant {
@@ -54,10 +55,15 @@ export function OverviewSection({ data }: { data: StatusResponse }) {
             <CardTitle className="text-base">VPS</CardTitle>
             <Badge>always on</Badge>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-1">
             <p className="text-sm text-muted-foreground">
               {oracleUp}/{oracleTotal} containers up
             </p>
+            {data.oracle.usage?.uptimeSeconds != null && (
+              <p className="text-xs text-muted-foreground">
+                Uptime: {formatUptime(data.oracle.usage.uptimeSeconds)}
+              </p>
+            )}
           </CardContent>
         </Card>
 

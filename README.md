@@ -12,7 +12,7 @@ committed to git).
 
 ### Features
 
-- **Overview tab**: VPS status, TLS certificate expiry, estimated monthly cost
+- **Overview tab**: VPS status with uptime, TLS certificate expiry, estimated monthly cost
 - **VPS tab**: live hardware usage (CPU, memory, disk), container table with start/stop/restart controls, log viewer with line filtering
 - **Dark mode**: toggle in the sidebar; defaults to system preference
 - **Auto-polling**: status refreshes every 5 seconds; manual refresh and error indicator in the toolbar
@@ -39,6 +39,7 @@ committed to git).
 - **iter-66** — Smarter time formatting: the "Updated" toolbar label now shows minutes, hours, or days instead of raw seconds.
 - **iter-67** — Keyboard shortcuts: Alt+1 switches to Overview, Alt+2 switches to VPS tab, enabling fast keyboard-driven navigation without using the sidebar.
 - **iter-68** — Connection health indicator: added a colored status dot to the toolbar (green = connected, red = disconnected) for at-a-glance backend health visibility.
+- **iter-69** — VPS uptime: added os.uptime() to the backend hardware payload; Overview VPS card now displays uptime (e.g. "12d 5h") for at-a-glance server stability visibility.
 
 ### How the GCP credential is handled
 
