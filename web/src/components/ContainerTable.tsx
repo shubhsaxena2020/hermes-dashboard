@@ -174,7 +174,9 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
       setCopiedLogs((c) => ({ ...c, [name]: true }))
       setTimeout(() => setCopiedLogs((c) => ({ ...c, [name]: false })), 2000)
     } catch {
-      // Clipboard API may not be available in all contexts
+      toast.error('Copy failed', {
+        description: 'Clipboard API is not available in this context.',
+      })
     }
   }
 

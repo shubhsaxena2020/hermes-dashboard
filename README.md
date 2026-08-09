@@ -73,6 +73,7 @@ committed to git).
 - **iter-102** — Sidebar down-container badge: the VPS nav item in the sidebar now shows a red count badge (e.g. "2") when containers are down, making the signal visible from any section without switching tabs. Badge includes an aria-label for screen reader announcement.
 - **iter-103** — Log copy button: added a Copy button to the container log toolbar that copies all (filtered) log lines to the clipboard with a brief "Copied!" confirmation. Enables quick sharing of debug output without manual select-all-copy.
 - **iter-104** — Overview VPS navigation link: added a conditional "View details →" button to the Overview VPS card that navigates directly to the VPS section. Only visible when containers are down, matching the existing "Down: ..." guard pattern.
+- **iter-105** — Clipboard copy error feedback: replaced the silent catch block in the log copy handler with a `toast.error()` notification, so users see a "Copy failed" toast when the Clipboard API is unavailable (e.g. non-secure contexts, denied permissions).
 
 ### How the GCP credential is handled
 
