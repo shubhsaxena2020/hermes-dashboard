@@ -59,6 +59,7 @@ committed to git).
 - **iter-87** — Container table empty state: added a centered "No containers match ..." message when the name filter matches zero containers, replacing the empty table body with clear feedback.
 - **iter-88** — Visibility-aware polling: status poll (5s) and timeAgo tick (1s) now pause when the browser tab is hidden, and immediately refresh when the tab becomes visible again. Saves bandwidth and battery while providing instant freshness on tab switch.
 - **iter-89** — Mobile sidebar focus trap: added `inert` and `aria-hidden` to `<main>` when the sidebar overlay is open on mobile, preventing keyboard focus from escaping behind the backdrop into page content. The `|| undefined` pattern ensures these attributes are absent (not false) when the sidebar is closed, avoiding any impact on desktop keyboard navigation.
+- **iter-90** — Container health tooltip: added hover tooltip to the VPS tab's "{up}/{total} up" badge, exposing the full count text for operators scanning at a glance.
 
 ### How the GCP credential is handled
 
