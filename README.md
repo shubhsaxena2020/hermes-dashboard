@@ -33,6 +33,7 @@ committed to git).
 - **iter-61** — CPU usage monitoring: added real-time host CPU utilization via os.cpus() sampling on the server; new color-coded progress bar in both the VPS Hardware panel and Overview system health card, completing the hardware monitoring triad (CPU, memory, disk).
 - **iter-62** — Extract shared color threshold utility: removed duplicated progressIndicatorClass/healthIndicatorClass from HardwarePanel and OverviewSection, consolidated into web/src/lib/color-threshold.ts.
 - **iter-63** — API response time: useStatus hook now tracks fetch duration via performance.now(); toolbar displays response time (e.g. "45ms") next to the "Updated" label so connection health is visible at a glance.
+- **iter-64** — Loading skeleton toolbar: added skeleton placeholders for the Updated/response-time/Refresh toolbar row to eliminate layout shift on initial data load.
 
 ### How the GCP credential is handled
 

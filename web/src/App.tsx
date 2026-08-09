@@ -20,6 +20,11 @@ function timeAgo(ts: number | null) {
 function LoadingSkeleton() {
   return (
     <div className="space-y-6" role="status" aria-label="Loading dashboard">
+      <div className="flex items-center justify-end mb-2 gap-2 flex-wrap">
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-4 w-12" />
+        <Skeleton className="h-8 w-16 rounded-md" />
+      </div>
       <Skeleton className="h-7 w-24" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card>
