@@ -79,7 +79,7 @@ function LoadingSkeleton() {
 
 function App() {
   const [section, setSection] = useState<SectionKey>('overview')
-  const { data, lastUpdated, error, refresh } = useStatus()
+  const { data, lastUpdated, error, responseMs, refresh } = useStatus()
   const [, forceTick] = useState(0)
   const [version, setVersion] = useState<{ commit: string | null; date: string | null } | null>(null)
   const { theme, setTheme } = useTheme()
@@ -168,6 +168,11 @@ function App() {
           <>
             <div className="flex items-center justify-end mb-2 gap-2 flex-wrap">
               <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
+              {responseMs != null && (
+                <span className="text-xs text-muted-foreground" title="API response time">
+                  {responseMs}ms
+                </span>
+              )}
               <Button
                 type="button"
                 size="default"
