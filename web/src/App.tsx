@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { Sun, Moon } from 'lucide-react'
+import { RefreshCw, Sun, Moon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useStatus } from '@/hooks/useStatus'
 import { OverviewSection } from '@/components/OverviewSection'
@@ -77,13 +78,16 @@ function App() {
           <>
             <div className="flex items-center justify-end mb-2 gap-2">
               <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
-              <button
+              <Button
+                size="sm"
+                variant="ghost"
                 onClick={refresh}
-                className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer"
+                className="text-muted-foreground h-7 gap-1.5"
                 aria-label="Refresh status"
               >
+                <RefreshCw className="size-3" />
                 Refresh
-              </button>
+              </Button>
               {error && (
                 <span className="text-xs text-destructive" title={error}>
                   ⚠ Stale — poll failed

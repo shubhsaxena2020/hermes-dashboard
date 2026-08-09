@@ -10,6 +10,13 @@ Start/Stop buttons, live queue/container/log detail while GCP is on, and
 auto-idle-shutdown. Login credentials are in `.env` on Oracle VPS (not
 committed to git).
 
+### Features
+
+- **Overview tab**: VPS status, TLS certificate expiry, estimated monthly cost
+- **VPS tab**: live hardware usage (CPU, memory, disk), container table with start/stop/restart controls, log viewer with line filtering
+- **Dark mode**: toggle in the sidebar; defaults to system preference
+- **Auto-polling**: status refreshes every 5 seconds; manual refresh and error indicator in the toolbar
+
 ### How the GCP credential is handled
 
 This project blocks service-account key creation at the org level, so the
