@@ -50,6 +50,7 @@ committed to git).
 - **iter-78** — Container table sorting: added clickable sort controls (Name, Status, CPU, MEM) above the infrastructure table with direction indicators, enabling quick identification of resource-heavy or stopped containers.
 - **iter-79** — Sort controls responsive wrap: added flex-wrap to the container table sort bar so sort buttons wrap on narrow viewports instead of overflowing, matching the action-button wrap pattern from iter-73.
 - **iter-80** — Container name filter: added a search input above the sort bar in the infrastructure table, filtering containers by name with a live count indicator (e.g. "5 of 19") when a filter is active.
+- **iter-81** — Container CPU/MEM columns: moved CPU and MEM data from inline bars in the name cell to dedicated right-aligned columns with percentage text and compact progress bars, decluttering the name cell and completing the sort-controls-to-visual-columns loop.
 
 ### How the GCP credential is handled
 

@@ -182,6 +182,8 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
           <TableRow>
             <TableHead>Container</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead className="text-right">CPU</TableHead>
+            <TableHead className="text-right">MEM</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -211,35 +213,6 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                         </Badge>
                       )}
                     </div>
-                    {(c.cpu || c.mem) && (
-                      <div className="text-xs text-muted-foreground mt-1 space-y-1">
-                        {cpuPct != null && (
-                          <div className="flex items-center gap-2">
-                            <span className="tabular-nums w-12 shrink-0">CPU {cpuPct}%</span>
-                            <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
-                              <div
-                                className={`h-full rounded-full transition-all ${progressIndicatorClass(cpuPct) || 'bg-primary'}`}
-                                style={{ width: `${Math.min(cpuPct, 100)}%` }}
-                              />
-                            </div>
-                          </div>
-                        )}
-                        {memPct != null && (
-                          <div className="flex items-center gap-2">
-                            <span className="tabular-nums w-12 shrink-0">MEM {memPct}%</span>
-                            <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
-                              <div
-                                className={`h-full rounded-full transition-all ${progressIndicatorClass(memPct) || 'bg-primary'}`}
-                                style={{ width: `${Math.min(memPct, 100)}%` }}
-                              />
-                            </div>
-                          </div>
-                        )}
-                        {cpuPct == null && memPct == null && (
-                          <span>{c.cpu} {c.mem ? `· ${c.mem}` : ''}</span>
-                        )}
-                      </div>
-                    )}
                   </TableCell>
                   <TableCell>
                     <span className="flex items-center gap-1.5" aria-label={c.up ? 'Running' : 'Stopped'}>
@@ -249,6 +222,36 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                       />
                       <span className={c.up ? 'text-green-500' : 'text-red-500'}>{c.status}</span>
                     </span>
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums text-sm">
+                    {cpuPct != null ? (
+                      <div className="flex items-center justify-end gap-2">
+                        <span>{cpuPct}%</span>
+                        <div className="w-16 h-1 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${progressIndicatorClass(cpuPct) || 'bg-primary'}`}
+                            style={{ width: `${Math.min(cpuPct, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">{c.cpu || '—'}</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right tabular-nums text-sm">
+                    {memPct != null ? (
+                      <div className="flex items-center justify-end gap-2">
+                        <span>{memPct}%</span>
+                        <div className="w-16 h-1 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${progressIndicatorClass(memPct) || 'bg-primary'}`}
+                            style={{ width: `${Math.min(memPct, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">{c.mem || '—'}</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-right whitespace-normal">
                     <div className="flex flex-wrap justify-end gap-1.5">
@@ -287,7 +290,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                 </TableRow>
                 {logState && (
                   <TableRow>
-                    <TableCell colSpan={3} className="p-0">
+                    <TableCell colSpan={5} className="p-0">
                       <div className="m-2 space-y-2">
                         {Array.isArray(logState) && (
                           <Input
