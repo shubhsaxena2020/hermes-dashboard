@@ -35,9 +35,18 @@ function LoadingSkeleton() {
           <CardHeader>
             <Skeleton className="h-5 w-24" />
           </CardHeader>
-          <CardContent className="space-x-4">
-            <Skeleton className="inline-block h-4 w-16" />
-            <Skeleton className="inline-block h-4 w-16" />
+          <CardContent className="space-y-3">
+            <Skeleton className="h-3 w-full" />
+            <Skeleton className="h-3 w-3/4" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-5 w-24" />
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            <Skeleton className="h-7 w-20 rounded-lg" />
+            <Skeleton className="h-7 w-16 rounded-lg" />
           </CardContent>
         </Card>
         <Card className="sm:col-span-2">

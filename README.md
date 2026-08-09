@@ -29,6 +29,7 @@ committed to git).
 - **iter-57** — Hardware panel visual feedback: added color-coded progress bars (yellow ≥60%, red ≥80%) and inline memory percentage for at-a-glance resource health.
 - **iter-58** — Accessibility: added aria-hidden="true" to decorative SVG icons in hamburger menu, refresh button, and theme toggle for cleaner screen reader output.
 - **iter-59** — Overview health card: added compact memory and disk progress bars to the Overview tab so system health is visible at a glance without switching to the VPS tab.
+- **iter-60** — Quick links restyle: converted plain anchor links to outlined buttons with external-link icons; added flex-wrap for responsive wrapping on narrow viewports; updated loading skeleton to match.
 
 ### How the GCP credential is handled
 

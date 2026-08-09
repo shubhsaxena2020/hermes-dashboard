@@ -1,7 +1,9 @@
 import { Badge } from '@/components/ui/badge'
+import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import type { BadgeVariant, HardwareUsage, StatusResponse } from '@/lib/api'
+import { ExternalLink } from 'lucide-react'
 
 function certBadgeVariant(daysRemaining?: number): BadgeVariant {
   if (daysRemaining == null) return 'destructive'
@@ -73,12 +75,12 @@ export function OverviewSection({ data }: { data: StatusResponse }) {
           <CardHeader>
             <CardTitle className="text-base">Quick links</CardTitle>
           </CardHeader>
-          <CardContent className="space-x-4 text-sm">
-            <a className="text-primary underline" href="https://portainer.shubhbuilds.com" target="_blank" rel="noreferrer">
-              Portainer
+          <CardContent className="flex flex-wrap gap-2">
+            <a className={buttonVariants({ variant: "outline", size: "sm" })} href="https://portainer.shubhbuilds.com" target="_blank" rel="noreferrer">
+              Portainer<ExternalLink className="ml-1.5 size-3" aria-hidden="true" />
             </a>
-            <a className="text-primary underline" href="https://monitor.shubhbuilds.com" target="_blank" rel="noreferrer">
-              Netdata
+            <a className={buttonVariants({ variant: "outline", size: "sm" })} href="https://monitor.shubhbuilds.com" target="_blank" rel="noreferrer">
+              Netdata<ExternalLink className="ml-1.5 size-3" aria-hidden="true" />
             </a>
           </CardContent>
         </Card>
