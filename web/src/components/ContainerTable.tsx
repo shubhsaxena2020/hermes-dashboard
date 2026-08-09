@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import type { BadgeVariant, ContainerInfo } from '@/lib/api'
+import { progressIndicatorClass } from '@/lib/color-threshold'
 
 interface Props {
   containers: ContainerInfo[]
@@ -133,8 +134,32 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                       )}
                     </div>
                     {(c.cpu || c.mem) && (
-                      <div className="text-xs text-muted-foreground">
-                        {c.cpu} {c.mem ? `· ${c.mem}` : ''}
+                      <div className="text-xs text-muted-foreground mt-1 space-y-1">
+                        {cpuPct != null && (
+                          <div className="flex items-center gap-2">
+                            <span className="tabular-nums w-12 shrink-0">CPU {cpuPct}%</span>
+                            <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all ${progressIndicatorClass(cpuPct) || 'bg-primary'}`}
+                                style={{ width: `${Math.min(cpuPct, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        {memPct != null && (
+                          <div className="flex items-center gap-2">
+                            <span className="tabular-nums w-12 shrink-0">MEM {memPct}%</span>
+                            <div className="flex-1 h-1 rounded-full bg-muted overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all ${progressIndicatorClass(memPct) || 'bg-primary'}`}
+                                style={{ width: `${Math.min(memPct, 100)}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+                        {cpuPct == null && memPct == null && (
+                          <span>{c.cpu} {c.mem ? `· ${c.mem}` : ''}</span>
+                        )}
                       </div>
                     )}
                   </TableCell>
