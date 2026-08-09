@@ -38,6 +38,7 @@ committed to git).
 - **iter-65** — TLS expiry dates: each certificate card now shows the formatted expiry date (e.g. "Expires Sep 15, 2026") below the domain name, and issuer info is available via hover tooltip.
 - **iter-66** — Smarter time formatting: the "Updated" toolbar label now shows minutes, hours, or days instead of raw seconds.
 - **iter-67** — Keyboard shortcuts: Alt+1 switches to Overview, Alt+2 switches to VPS tab, enabling fast keyboard-driven navigation without using the sidebar.
+- **iter-68** — Connection health indicator: added a colored status dot to the toolbar (green = connected, red = disconnected) for at-a-glance backend health visibility.
 
 ### How the GCP credential is handled
 

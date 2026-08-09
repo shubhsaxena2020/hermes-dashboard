@@ -178,6 +178,12 @@ function App() {
         ) : (
           <>
             <div className="flex items-center justify-end mb-2 gap-2 flex-wrap">
+              <span
+                className={`w-2 h-2 rounded-full inline-block ${error ? 'bg-red-500' : 'bg-green-500'}`}
+                role="img"
+                aria-label={error ? 'Disconnected' : 'Connected'}
+                title={error ? `Disconnected: ${error}` : 'Backend reachable'}
+              />
               <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
               {responseMs != null && (
                 <span className="text-xs text-muted-foreground" title="API response time">
