@@ -64,6 +64,7 @@ committed to git).
 - **iter-92** — Sort button accessibility: added `aria-label` with sort direction ("ascending"/"descending") to container table sort buttons, so screen readers announce both the active column and its direction instead of only the column name.
 - **iter-93** — Container filter clear button: added a × button inside the filter input that appears when text is active, enabling one-click filter reset instead of manual select-all-delete.
 - **iter-94** — Container action loading indicator: Start, Stop, and Restart buttons now show a spinning Loader2 icon while the API call is in flight, giving users clear visual feedback that their action is processing instead of just a disabled button.
+- **iter-95** — Filter Escape shortcut: pressing Escape in the container name filter or log line filter instantly clears the filter text, matching standard filterable-list UX patterns and improving keyboard workflow.
 
 ### How the GCP credential is handled
 
