@@ -138,7 +138,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
 
   return (
     <>
-      <div className="flex items-center gap-1.5 mb-3">
+      <div className="flex flex-wrap items-center gap-1.5 mb-3">
         <span className="text-xs text-muted-foreground mr-1">Sort:</span>
         {SORT_OPTIONS.map((opt) => (
           <Button

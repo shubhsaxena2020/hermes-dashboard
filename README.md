@@ -48,6 +48,7 @@ committed to git).
 - **iter-76** — TLS cert urgency sort: certificates are now sorted by days remaining (ascending), with error certs first, so the most urgent renewal appears at a glance.
 - **iter-77** — VPS tab container health: added "{up}/{total} up" badge to the VPS tab header for at-a-glance container health visibility.
 - **iter-78** — Container table sorting: added clickable sort controls (Name, Status, CPU, MEM) above the infrastructure table with direction indicators, enabling quick identification of resource-heavy or stopped containers.
+- **iter-79** — Sort controls responsive wrap: added flex-wrap to the container table sort bar so sort buttons wrap on narrow viewports instead of overflowing, matching the action-button wrap pattern from iter-73.
 
 ### How the GCP credential is handled
 
