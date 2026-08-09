@@ -128,7 +128,7 @@ function App() {
         className="fixed top-4 left-4 z-[60] p-2 rounded-md bg-card border shadow-md md:hidden"
         aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
       >
-        {sidebarOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+        {sidebarOpen ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
       </button>
 
       <Sidebar
@@ -167,7 +167,7 @@ function App() {
                 className="text-muted-foreground"
                 aria-label="Refresh status"
               >
-                <RefreshCw className="size-3" />
+                <RefreshCw className="size-3" aria-hidden="true" />
                 Refresh
               </Button>
               {error && (
