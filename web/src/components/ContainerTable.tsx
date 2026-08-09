@@ -170,6 +170,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
             variant={sortKey === opt.key ? 'secondary' : 'ghost'}
             className="h-6 px-2 text-xs"
             aria-pressed={sortKey === opt.key}
+            aria-label={`Sort by ${opt.label}, ${sortKey === opt.key ? (sortAsc ? 'ascending' : 'descending') : 'default order'}`}
             onClick={() => toggleSort(opt.key)}
           >
             {opt.label}
