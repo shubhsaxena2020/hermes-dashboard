@@ -372,7 +372,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                         )}
                         <pre role="log" aria-label="Container logs" className="bg-muted/50 text-xs p-3 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md">
                           {logState === 'loading'
-                            ? 'Loading…'
+                            ? <span className="flex items-center gap-1.5 text-muted-foreground"><Loader2 className="size-3 animate-spin" aria-hidden="true" /> Loading…</span>
                             : (filteredLines as string[]).join('\n') || (filter ? '(no matching lines)' : '(no output)')}
                         </pre>
                       </div>
