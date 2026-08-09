@@ -10,12 +10,7 @@ import { OverviewSection } from '@/components/OverviewSection'
 import { OracleSection } from '@/components/OracleSection'
 import { Sidebar, type SectionKey } from '@/components/Sidebar'
 import { api } from '@/lib/api'
-
-function timeAgo(ts: number | null) {
-  if (!ts) return ''
-  const secs = Math.round((Date.now() - ts) / 1000)
-  return secs <= 1 ? 'just now' : `${secs}s ago`
-}
+import { timeAgo } from '@/lib/time'
 
 function LoadingSkeleton() {
   return (
