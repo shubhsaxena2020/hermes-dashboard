@@ -41,16 +41,16 @@ function App() {
       <nav className="w-48 shrink-0 border-r bg-card py-5 sticky top-0 h-screen flex flex-col">
         <h1 className="px-5 text-sm font-semibold mb-5">VPS Control</h1>
         {NAV_ITEMS.map((item) => (
-          <div
+          <button
             key={item.key}
             onClick={() => setSection(item.key)}
             className={cn(
-              'px-5 py-2 text-sm cursor-pointer border-l-2 border-transparent text-muted-foreground hover:bg-accent',
+              'px-5 py-2 text-sm cursor-pointer border-l-2 border-transparent text-left text-muted-foreground hover:bg-accent',
               section === item.key && 'border-primary text-foreground bg-accent',
             )}
           >
             {item.label}
-          </div>
+          </button>
         ))}
         {version?.commit && (
           <div className="mt-auto px-5 text-xs text-muted-foreground" title={version.date || undefined}>
@@ -64,14 +64,10 @@ function App() {
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : (
           <>
-            {section === 'overview' && (
-              <div>
-                <div className="flex justify-end mb-2">
-                  <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
-                </div>
-                <OverviewSection data={data} />
-              </div>
-            )}
+            <div className="flex justify-end mb-2">
+              <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
+            </div>
+            {section === 'overview' && <OverviewSection data={data} />}
             {section === 'oracle' && <OracleSection oracle={data.oracle} refresh={refresh} />}
           </>
         )}
