@@ -75,10 +75,17 @@ function App() {
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : (
           <>
-            <div className="flex justify-end mb-2">
+            <div className="flex items-center justify-end mb-2 gap-2">
               <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
+              <button
+                onClick={refresh}
+                className="text-xs text-muted-foreground hover:text-foreground underline cursor-pointer"
+                aria-label="Refresh status"
+              >
+                Refresh
+              </button>
               {error && (
-                <span className="ml-3 text-xs text-destructive" title={error}>
+                <span className="text-xs text-destructive" title={error}>
                   ⚠ Stale — poll failed
                 </span>
               )}
