@@ -169,6 +169,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
             size="sm"
             variant={sortKey === opt.key ? 'secondary' : 'ghost'}
             className="h-6 px-2 text-xs"
+            aria-pressed={sortKey === opt.key}
             onClick={() => toggleSort(opt.key)}
           >
             {opt.label}
@@ -298,6 +299,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                         {Array.isArray(logState) && (
                           <Input
                             placeholder="Filter log lines…"
+                            aria-label="Filter log lines"
                             value={filter}
                             onChange={(e) => setLogFilter((f) => ({ ...f, [c.name]: e.target.value }))}
                             className="h-7 text-xs max-w-xs"
