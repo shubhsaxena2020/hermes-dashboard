@@ -315,6 +315,13 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
               </Fragment>
             )
           })}
+          {sorted.length === 0 && nameFilter && (
+            <TableRow>
+              <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-8">
+                No containers match &ldquo;{nameFilter}&rdquo;
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
 
