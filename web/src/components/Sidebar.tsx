@@ -3,8 +3,8 @@ import { Sun, Moon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
-  { key: 'overview', label: 'Overview' },
-  { key: 'oracle', label: 'VPS' },
+  { key: 'overview', label: 'Overview', shortcut: 'Alt+1' },
+  { key: 'oracle', label: 'VPS', shortcut: 'Alt+2' },
 ] as const
 
 export type SectionKey = (typeof NAV_ITEMS)[number]['key']
@@ -44,12 +44,18 @@ export const Sidebar = forwardRef<HTMLButtonElement, SidebarProps>(
               onClose?.()
             }}
             className={cn(
-              'px-5 py-2.5 text-sm cursor-pointer border-l-2 border-transparent text-left text-muted-foreground hover:bg-accent',
+              'px-5 py-2.5 text-sm cursor-pointer border-l-2 border-transparent text-left text-muted-foreground hover:bg-accent flex items-center justify-between',
               section === item.key && 'border-primary text-foreground bg-accent',
             )}
             aria-current={section === item.key ? 'page' : undefined}
           >
             {item.label}
+            <kbd
+              className="text-[10px] text-muted-foreground/60 border border-border rounded px-1 py-0 font-mono flex-shrink-0 hidden md:inline-block"
+              aria-hidden="true"
+            >
+              {item.shortcut}
+            </kbd>
           </button>
         ))}
         <button

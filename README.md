@@ -40,6 +40,7 @@ committed to git).
 - **iter-67** — Keyboard shortcuts: Alt+1 switches to Overview, Alt+2 switches to VPS tab, enabling fast keyboard-driven navigation without using the sidebar.
 - **iter-68** — Connection health indicator: added a colored status dot to the toolbar (green = connected, red = disconnected) for at-a-glance backend health visibility.
 - **iter-69** — VPS uptime: added os.uptime() to the backend hardware payload; Overview VPS card now displays uptime (e.g. "12d 5h") for at-a-glance server stability visibility.
+- **iter-70** — Keyboard shortcut hints: added `<kbd>` visual indicators next to sidebar nav items (Alt+1, Alt+2) on desktop for discoverability.
 
 ### How the GCP credential is handled
 
