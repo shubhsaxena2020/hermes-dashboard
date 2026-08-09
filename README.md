@@ -62,6 +62,7 @@ committed to git).
 - **iter-90** — Container health tooltip: added hover tooltip to the VPS tab's "{up}/{total} up" badge, exposing the full count text for operators scanning at a glance.
 - **iter-91** — Initial-load error visibility: moved the connection-lost banner above the data conditional so it renders even when the first `/api/status` fetch fails. Previously the user saw loading skeletons indefinitely with no feedback that the backend was unreachable.
 - **iter-92** — Sort button accessibility: added `aria-label` with sort direction ("ascending"/"descending") to container table sort buttons, so screen readers announce both the active column and its direction instead of only the column name.
+- **iter-93** — Container filter clear button: added a × button inside the filter input that appears when text is active, enabling one-click filter reset instead of manual select-all-delete.
 
 ### How the GCP credential is handled
 

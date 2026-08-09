@@ -147,13 +147,25 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <Input
-          placeholder="Filter containers…"
-          value={nameFilter}
-          onChange={(e) => setNameFilter(e.target.value)}
-          className="h-7 text-xs max-w-xs"
-          aria-label="Filter containers by name"
-        />
+        <div className="relative max-w-xs">
+          <Input
+            placeholder="Filter containers…"
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+            className="h-7 text-xs pr-7"
+            aria-label="Filter containers by name"
+          />
+          {nameFilter && (
+            <button
+              type="button"
+              onClick={() => setNameFilter('')}
+              aria-label="Clear filter"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-foreground"
+            >
+              ×
+            </button>
+          )}
+        </div>
         {nameFilter && (
           <span className="text-xs text-muted-foreground">
             {sorted.length} of {containers.length}
