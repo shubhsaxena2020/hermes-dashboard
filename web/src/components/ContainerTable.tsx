@@ -317,7 +317,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                     <div className="flex flex-wrap justify-end gap-1.5">
                     {canControl && !c.up && (
                       <Button size="default" variant="default" disabled={isPending} onClick={() => runAction(c.name, 'start')}>
-                        {isPending ? <Loader2 className="size-3 animate-spin" aria-hidden="true" /> : 'Start'}
+                        {isPending ? <Loader2 className="size-3 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : 'Start'}
                       </Button>
                     )}
                     {canControl && c.up && (
@@ -328,7 +328,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                           disabled={isPending}
                           onClick={() => setConfirmTarget({ name: c.name, action: 'stop' })}
                         >
-                          {isPending ? <Loader2 className="size-3 animate-spin" aria-hidden="true" /> : 'Stop'}
+                          {isPending ? <Loader2 className="size-3 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : 'Stop'}
                         </Button>
                         <Button
                           size="default"
@@ -336,7 +336,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                           disabled={isPending}
                           onClick={() => setConfirmTarget({ name: c.name, action: 'restart' })}
                         >
-                          {isPending ? <Loader2 className="size-3 animate-spin" aria-hidden="true" /> : 'Restart'}
+                          {isPending ? <Loader2 className="size-3 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : 'Restart'}
                         </Button>
                       </>
                     )}
@@ -379,7 +379,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                               aria-label={autoRefresh[c.name] ? 'Stop auto-refreshing logs' : 'Auto-refresh logs every 15 seconds'}
                               onClick={() => setAutoRefresh((a) => ({ ...a, [c.name]: !a[c.name] }))}
                             >
-                              <RefreshCw className={`size-3 ${autoRefresh[c.name] ? 'animate-spin' : ''}`} aria-hidden="true" />
+                              <RefreshCw className={`size-3 ${autoRefresh[c.name] ? 'animate-spin motion-reduce:animate-none' : ''}`} aria-hidden="true" />
                               {autoRefresh[c.name] ? 'Live' : 'Auto'}
                             </Button>
                             {Array.isArray(filteredLines) && (
@@ -409,7 +409,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                         )}
                         <pre role="log" aria-label="Container logs" className="bg-muted/50 text-xs p-3 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md">
                           {logState === 'loading'
-                            ? <span className="flex items-center gap-1.5 text-muted-foreground"><Loader2 className="size-3 animate-spin" aria-hidden="true" /> Loading…</span>
+                            ? <span className="flex items-center gap-1.5 text-muted-foreground"><Loader2 className="size-3 animate-spin motion-reduce:animate-none" aria-hidden="true" /> Loading…</span>
                             : (filteredLines as string[]).join('\n') || (filter ? '(no matching lines)' : '(no output)')}
                         </pre>
                       </div>

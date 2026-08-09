@@ -58,7 +58,7 @@ export function OracleSection({ oracle, refresh }: { oracle: StatusResponse['ora
             aria-label={`Start all ${downControllable.length} stopped container${downControllable.length !== 1 ? 's' : ''}`}
           >
             {startingAll
-              ? <Loader2 className="size-3 animate-spin" aria-hidden="true" />
+              ? <Loader2 className="size-3 animate-spin motion-reduce:animate-none" aria-hidden="true" />
               : <Play className="size-3" aria-hidden="true" />}
             Start all ({downControllable.length})
           </Button>
