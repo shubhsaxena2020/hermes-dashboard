@@ -3,6 +3,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import type { BadgeVariant, HardwareUsage, StatusResponse } from '@/lib/api'
+import { progressIndicatorClass } from '@/lib/color-threshold'
 import { ExternalLink } from 'lucide-react'
 
 function certBadgeVariant(daysRemaining?: number): BadgeVariant {
@@ -12,12 +13,6 @@ function certBadgeVariant(daysRemaining?: number): BadgeVariant {
   return 'outline'
 }
 
-function healthIndicatorClass(pct: number): string {
-  if (pct >= 80) return 'bg-destructive'
-  if (pct >= 60) return 'bg-yellow-500'
-  return ''
-}
-
 function HealthRow({ label, pct, detail }: { label: string; pct: number; detail: string }) {
   return (
     <div className="space-y-1">
@@ -25,7 +20,7 @@ function HealthRow({ label, pct, detail }: { label: string; pct: number; detail:
         <span className="text-muted-foreground">{label}</span>
         <span className="tabular-nums">{detail}</span>
       </div>
-      <Progress value={pct} indicatorClassName={healthIndicatorClass(pct)} />
+      <Progress value={pct} indicatorClassName={progressIndicatorClass(pct)} />
     </div>
   )
 }

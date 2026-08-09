@@ -31,6 +31,7 @@ committed to git).
 - **iter-59** — Overview health card: added compact memory and disk progress bars to the Overview tab so system health is visible at a glance without switching to the VPS tab.
 - **iter-60** — Quick links restyle: converted plain anchor links to outlined buttons with external-link icons; added flex-wrap for responsive wrapping on narrow viewports; updated loading skeleton to match.
 - **iter-61** — CPU usage monitoring: added real-time host CPU utilization via os.cpus() sampling on the server; new color-coded progress bar in both the VPS Hardware panel and Overview system health card, completing the hardware monitoring triad (CPU, memory, disk).
+- **iter-62** — Extract shared color threshold utility: removed duplicated progressIndicatorClass/healthIndicatorClass from HardwarePanel and OverviewSection, consolidated into web/src/lib/color-threshold.ts.
 
 ### How the GCP credential is handled
 

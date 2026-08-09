@@ -1,11 +1,6 @@
 import { Progress } from '@/components/ui/progress'
 import type { HardwareUsage } from '@/lib/api'
-
-function progressIndicatorClass(pct: number): string {
-  if (pct >= 80) return 'bg-destructive'
-  if (pct >= 60) return 'bg-yellow-500'
-  return ''
-}
+import { progressIndicatorClass } from '@/lib/color-threshold'
 
 export function HardwarePanel({ usage }: { usage?: HardwareUsage | null }) {
   const cpuPct = usage?.cpuUsagePct ?? 0
