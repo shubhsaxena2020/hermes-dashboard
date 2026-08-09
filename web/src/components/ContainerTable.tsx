@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { ArrowDown, ArrowUp } from 'lucide-react'
+import { ArrowDown, ArrowUp, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -274,7 +274,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                     <div className="flex flex-wrap justify-end gap-1.5">
                     {canControl && !c.up && (
                       <Button size="default" variant="default" disabled={isPending} onClick={() => runAction(c.name, 'start')}>
-                        Start
+                        {isPending ? <Loader2 className="size-3 animate-spin" aria-hidden="true" /> : 'Start'}
                       </Button>
                     )}
                     {canControl && c.up && (
@@ -285,7 +285,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                           disabled={isPending}
                           onClick={() => setConfirmTarget({ name: c.name, action: 'stop' })}
                         >
-                          Stop
+                          {isPending ? <Loader2 className="size-3 animate-spin" aria-hidden="true" /> : 'Stop'}
                         </Button>
                         <Button
                           size="default"
@@ -293,7 +293,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                           disabled={isPending}
                           onClick={() => setConfirmTarget({ name: c.name, action: 'restart' })}
                         >
-                          Restart
+                          {isPending ? <Loader2 className="size-3 animate-spin" aria-hidden="true" /> : 'Restart'}
                         </Button>
                       </>
                     )}
