@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { RefreshCw, Menu, X } from 'lucide-react'
+import { RefreshCw, Menu, X, WifiOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -215,6 +215,15 @@ function App() {
                 </span>
               )}
             </div>
+            {error && (
+              <div
+                className="mb-4 rounded-md border border-amber-500/50 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2"
+                role="alert"
+              >
+                <WifiOff className="size-4 shrink-0" aria-hidden="true" />
+                <span>Connection lost — showing stale data. Will retry automatically.</span>
+              </div>
+            )}
             <ErrorBoundary key={section} sectionLabel={section === 'overview' ? 'Overview' : 'VPS'}>
               {section === 'overview' && <OverviewSection data={data} />}
               {section === 'oracle' && <OracleSection oracle={data.oracle} refresh={refresh} />}

@@ -55,6 +55,7 @@ committed to git).
 - **iter-83** — TLS health summary: added a count badge to the TLS certificates card header (e.g. "6/6 OK", "5 OK · 1 expiring", "1 error") for at-a-glance certificate health visibility. Also documented the shared threshold alignment between ContainerTable's resourceBadgeVariant and color-threshold.ts.
 - **iter-84** — TLS threshold constants: extracted hardcoded 14-day and 30-day expiry thresholds from OverviewSection into named constants in color-threshold.ts, eliminating threshold drift between the per-cert badge and the summary badge.
 - **iter-85** — Document title: browser tab now shows the active section ("Overview" / "VPS") and a ⚠ indicator when the backend connection is stale, so users can identify the dashboard tab and its health at a glance among many open tabs.
+- **iter-86** — Connection-lost banner: added a prominent amber alert banner that appears above content when the backend is unreachable, replacing the tiny toolbar-only indicator. Uses role="alert" for screen reader announcement and auto-dismisses when connection restores.
 
 ### How the GCP credential is handled
 
