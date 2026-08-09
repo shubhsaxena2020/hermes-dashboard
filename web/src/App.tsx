@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useStatus } from '@/hooks/useStatus'
 import { OverviewSection } from '@/components/OverviewSection'
 import { OracleSection } from '@/components/OracleSection'
@@ -12,6 +14,57 @@ function timeAgo(ts: number | null) {
   if (!ts) return ''
   const secs = Math.round((Date.now() - ts) / 1000)
   return secs <= 1 ? 'just now' : `${secs}s ago`
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Skeleton className="h-7 w-24" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <Skeleton className="h-5 w-16" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-4 w-32" />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-5 w-24" />
+          </CardHeader>
+          <CardContent className="space-x-4">
+            <Skeleton className="inline-block h-4 w-16" />
+            <Skeleton className="inline-block h-4 w-16" />
+          </CardContent>
+        </Card>
+        <Card className="sm:col-span-2">
+          <CardHeader>
+            <Skeleton className="h-5 w-32" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center justify-between gap-2 rounded-md border px-3 py-2">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-5 w-8 rounded-full" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="sm:col-span-2">
+          <CardHeader>
+            <Skeleton className="h-5 w-32" />
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-4 w-48" />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
 }
 
 function App() {
@@ -45,7 +98,7 @@ function App() {
 
       <main className="flex-1 p-8 max-w-5xl">
         {!data ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <LoadingSkeleton />
         ) : (
           <>
             <div className="flex items-center justify-end mb-2 gap-2 flex-wrap">
