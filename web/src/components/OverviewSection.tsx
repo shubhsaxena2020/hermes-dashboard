@@ -45,6 +45,10 @@ function SystemHealth({ usage }: { usage: HardwareUsage | null }) {
 export function OverviewSection({ data }: { data: StatusResponse }) {
   const oracleUp = data.oracle.containers.filter((c) => c.up).length
   const oracleTotal = data.oracle.containers.length
+  const downContainers = data.oracle.containers.filter((c) => !c.up).map((c) => c.name)
+  const MAX_NAMES = 3
+  const shownNames = downContainers.slice(0, MAX_NAMES)
+  const overflow = downContainers.length - MAX_NAMES
 
   return (
     <div className="space-y-6">
@@ -59,6 +63,12 @@ export function OverviewSection({ data }: { data: StatusResponse }) {
             <p className="text-sm text-muted-foreground">
               {oracleUp}/{oracleTotal} containers up
             </p>
+            {downContainers.length > 0 && (
+              <p className="text-xs text-destructive">
+                Down: {shownNames.join(', ')}
+                {overflow > 0 && ` and ${overflow} more`}
+              </p>
+            )}
             {data.oracle.usage?.uptimeSeconds != null && (
               <p className="text-xs text-muted-foreground">
                 Uptime: {formatUptime(data.oracle.usage.uptimeSeconds)}
