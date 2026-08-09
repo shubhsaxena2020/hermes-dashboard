@@ -46,6 +46,7 @@ committed to git).
 - **iter-73** — Container actions responsive wrap: action buttons (Start/Stop/Restart/Logs) in the infrastructure table now wrap on narrow viewports instead of overflowing, fixing a mobile responsiveness regression.
 - **iter-75** — Container status accessibility: added colored dot indicator to the status column for colorblind users (non-color signaling).
 - **iter-76** — TLS cert urgency sort: certificates are now sorted by days remaining (ascending), with error certs first, so the most urgent renewal appears at a glance.
+- **iter-77** — VPS tab container health: added "{up}/{total} up" badge to the VPS tab header for at-a-glance container health visibility.
 
 ### How the GCP credential is handled
 
