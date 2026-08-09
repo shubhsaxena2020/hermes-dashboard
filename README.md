@@ -13,7 +13,7 @@ committed to git).
 ### Features
 
 - **Overview tab**: VPS status with uptime, TLS certificate expiry, estimated monthly cost
-- **VPS tab**: live hardware usage (CPU, memory, disk), container table with start/stop/restart controls, log viewer with line filtering
+- **VPS tab**: live hardware usage (CPU, memory, disk), container table with start/stop/restart controls, log viewer with line filtering and auto-refresh
 - **Dark mode**: toggle in the sidebar; defaults to system preference
 - **Auto-polling**: status refreshes every 5 seconds; manual refresh and error indicator in the toolbar
 - **Keyboard shortcuts**: Alt+1 for Overview, Alt+2 for VPS tab
@@ -68,6 +68,8 @@ committed to git).
 - **iter-97** — Redundant aria-hidden removal: removed `aria-hidden` from `<main>` when the mobile sidebar is open; `inert` already provides both keyboard focus blocking and accessibility tree exclusion, so the duplicate `aria-hidden` was unnecessary and sent mixed signals to assistive technology.
 - **iter-98** — Mobile container resource summary: added a compact CPU% / MEM% line below each container name on screens below the `sm` breakpoint, so operators on mobile can see per-container resource usage without switching to desktop. The dedicated CPU and MEM columns remain hidden on mobile to avoid table overflow; this line fills the visibility gap.
 - **iter-99** — Badge utility extraction: extracted `resourceBadgeInfo` and `certBadgeVariant` into shared `src/lib/badge-utils.ts`, removed local duplicates from ContainerTable and OverviewSection, and added vitest with 9 unit tests covering both functions.
+- **iter-100** — Log auto-refresh: added a toggle button next to the log filter that polls container logs every 15 seconds while active, with a spinning RefreshCw icon and "Live" label. Auto-refresh clears when the log panel is closed. Eliminates the manual open/close/reopen cycle for monitoring live log output.
+- **iter-101** — Log line count indicator: the log panel now shows a line count ("42 lines" or "42 of 3,847 lines" when filtering), mirroring the container name filter count pattern, and adds `role="log"` for screen reader semantics.
 
 ### How the GCP credential is handled
 

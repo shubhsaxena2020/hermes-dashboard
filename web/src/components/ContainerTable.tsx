@@ -1,5 +1,5 @@
-import { Fragment, useState } from 'react'
-import { ArrowDown, ArrowUp, Loader2 } from 'lucide-react'
+import { Fragment, useEffect, useRef, useState } from 'react'
+import { ArrowDown, ArrowUp, Loader2, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -72,6 +72,32 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortAsc, setSortAsc] = useState(true)
   const [nameFilter, setNameFilter] = useState('')
+  const [autoRefresh, setAutoRefresh] = useState<Record<string, boolean>>({})
+
+  // Stable ref so the auto-refresh useEffect doesn't re-run when the parent
+  // passes a new inline callback on every render (App → OracleSection → here).
+  const onLogsRef = useRef(onLogs)
+  onLogsRef.current = onLogs
+
+  // Poll logs every 15 s for containers with auto-refresh enabled.
+  useEffect(() => {
+    const active = Object.entries(autoRefresh).filter(([, on]) => on).map(([name]) => name)
+    if (active.length === 0) return
+    const id = setInterval(async () => {
+      for (const name of active) {
+        try {
+          const logs = await onLogsRef.current(name)
+          setOpenLogs((prev) => {
+            if (!prev[name]) return prev // closed in the meantime
+            return { ...prev, [name]: logs }
+          })
+        } catch {
+          // Silently ignore — next interval will retry
+        }
+      }
+    }, 15_000)
+    return () => clearInterval(id)
+  }, [autoRefresh])
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
@@ -121,6 +147,12 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
     if (openLogs[name]) {
       setOpenLogs((o) => {
         const next = { ...o }
+        delete next[name]
+        return next
+      })
+      setAutoRefresh((a) => {
+        if (!a[name]) return a
+        const next = { ...a }
         delete next[name]
         return next
       })
@@ -308,16 +340,37 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                     <TableCell colSpan={5} className="p-0">
                       <div className="m-2 space-y-2">
                         {Array.isArray(logState) && (
-                          <Input
-                            placeholder="Filter log lines…"
-                            aria-label="Filter log lines"
-                            value={filter}
-                            onChange={(e) => setLogFilter((f) => ({ ...f, [c.name]: e.target.value }))}
-                            onKeyDown={(e) => { if (e.key === 'Escape') setLogFilter((f) => ({ ...f, [c.name]: '' })) }}
-                            className="h-7 text-xs max-w-xs"
-                          />
+                          <div className="flex items-center gap-2">
+                            <Input
+                              placeholder="Filter log lines…"
+                              aria-label="Filter log lines"
+                              value={filter}
+                              onChange={(e) => setLogFilter((f) => ({ ...f, [c.name]: e.target.value }))}
+                              onKeyDown={(e) => { if (e.key === 'Escape') setLogFilter((f) => ({ ...f, [c.name]: '' })) }}
+                              className="h-7 text-xs max-w-xs"
+                            />
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant={autoRefresh[c.name] ? 'default' : 'outline'}
+                              className="h-7 px-2 text-xs gap-1"
+                              aria-pressed={!!autoRefresh[c.name]}
+                              aria-label={autoRefresh[c.name] ? 'Stop auto-refreshing logs' : 'Auto-refresh logs every 15 seconds'}
+                              onClick={() => setAutoRefresh((a) => ({ ...a, [c.name]: !a[c.name] }))}
+                            >
+                              <RefreshCw className={`size-3 ${autoRefresh[c.name] ? 'animate-spin' : ''}`} aria-hidden="true" />
+                              {autoRefresh[c.name] ? 'Live' : 'Auto'}
+                            </Button>
+                            {Array.isArray(logState) && (
+                              <span className="text-xs text-muted-foreground">
+                                {filter
+                                  ? `${filteredLines.length} of ${logState.length} lines`
+                                  : `${logState.length} lines`}
+                              </span>
+                            )}
+                          </div>
                         )}
-                        <pre className="bg-muted/50 text-xs p-3 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md">
+                        <pre role="log" aria-label="Container logs" className="bg-muted/50 text-xs p-3 max-h-64 overflow-y-auto whitespace-pre-wrap rounded-md">
                           {logState === 'loading'
                             ? 'Loading…'
                             : (filteredLines as string[]).join('\n') || (filter ? '(no matching lines)' : '(no output)')}
