@@ -1,42 +1,14 @@
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import type { HardwareUsage, StatusResponse } from '@/lib/api'
-import { progressIndicatorClass, TLS_EXPIRING_SOON_DAYS } from '@/lib/color-threshold'
+import type { StatusResponse } from '@/lib/api'
+import { TLS_EXPIRING_SOON_DAYS } from '@/lib/color-threshold'
 import { formatUptime } from '@/lib/time'
 import { ExternalLink } from 'lucide-react'
+import { HardwarePanel } from '@/components/HardwarePanel'
 
 import { certBadgeVariant } from '@/lib/badge-utils'
 import type { SectionKey } from '@/components/Sidebar'
-
-function HealthRow({ label, pct, detail }: { label: string; pct: number; detail: string }) {
-  return (
-    <div className="space-y-1">
-      <div className="flex justify-between text-xs">
-        <span className="text-muted-foreground">{label}</span>
-        <span className="tabular-nums">{detail}</span>
-      </div>
-      <Progress value={pct} indicatorClassName={progressIndicatorClass(pct)} />
-    </div>
-  )
-}
-
-function SystemHealth({ usage }: { usage: HardwareUsage | null }) {
-  if (!usage) return <p className="text-sm text-muted-foreground">Usage unavailable.</p>
-  const cpuPct = usage.cpuUsagePct ?? 0
-  const memPct = usage.memTotalMb ? Math.round(((usage.memUsedMb ?? 0) / usage.memTotalMb) * 100) : 0
-  const diskPct = usage.diskPct ? Number(usage.diskPct.replace('%', '')) : 0
-  return (
-    <div className="space-y-3">
-      {usage.cpuUsagePct != null && (
-        <HealthRow label={`CPU (${usage.cpus ?? '?'} cores)`} pct={cpuPct} detail={`${cpuPct}%`} />
-      )}
-      <HealthRow label="Memory" pct={memPct} detail={`${usage.memUsedMb ?? '?'} / ${usage.memTotalMb ?? '?'} MB`} />
-      <HealthRow label="Disk" pct={diskPct} detail={`${usage.diskUsed ?? '?'} / ${usage.diskTotal ?? '?'}`} />
-    </div>
-  )
-}
 
 export function OverviewSection({ data, onNavigate }: { data: StatusResponse; onNavigate?: (section: SectionKey) => void }) {
   const oracleUp = data.oracle.containers.filter((c) => c.up).length
@@ -88,7 +60,7 @@ export function OverviewSection({ data, onNavigate }: { data: StatusResponse; on
             <CardTitle className="text-base">System health</CardTitle>
           </CardHeader>
           <CardContent>
-            <SystemHealth usage={data.oracle.usage} />
+            <HardwarePanel usage={data.oracle.usage} />
           </CardContent>
         </Card>
 
