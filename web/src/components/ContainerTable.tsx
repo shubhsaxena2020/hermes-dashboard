@@ -15,8 +15,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import type { BadgeVariant, ContainerInfo } from '@/lib/api'
+import type { ContainerInfo } from '@/lib/api'
 import { progressIndicatorClass } from '@/lib/color-threshold'
+import { resourceBadgeInfo } from '@/lib/badge-utils'
 
 type SortKey = 'name' | 'status' | 'cpu' | 'mem'
 const SORT_OPTIONS: { key: SortKey; label: string; defaultAsc: boolean }[] = [
@@ -61,36 +62,6 @@ function parseMemPercent(mem?: string): number | null {
   const total = parseMemBytes(totalStr)
   if (used == null || !total) return null
   return (used / total) * 100
-}
-
-// Resource-usage thresholds mirror progressIndicatorClass in color-threshold.ts
-// (80% destructive, 60% warning) so both progress bars and badges use the same
-// severity scale. Keep these in sync if either function's breakpoints change.
-// Examines CPU and MEM independently — badge label names the stressed resource(s)
-// so operators know which metric to investigate, even on mobile where the CPU/MEM
-// columns are hidden.
-function resourceBadgeInfo(
-  cpuPct: number | null,
-  memPct: number | null,
-): { variant: BadgeVariant; label: string } | null {
-  const cpuHigh = cpuPct != null && cpuPct >= 80
-  const memHigh = memPct != null && memPct >= 80
-  const cpuElev = cpuPct != null && cpuPct >= 60
-  const memElev = memPct != null && memPct >= 60
-
-  if (cpuHigh || memHigh) {
-    const parts = []
-    if (cpuHigh) parts.push('CPU')
-    if (memHigh) parts.push('MEM')
-    return { variant: 'destructive', label: `${parts.join('+')} high` }
-  }
-  if (cpuElev || memElev) {
-    const parts = []
-    if (cpuElev) parts.push('CPU')
-    if (memElev) parts.push('MEM')
-    return { variant: 'secondary', label: `${parts.join('+')} elevated` }
-  }
-  return null
 }
 
 export function ContainerTable({ containers, controllable, viewable, onAction, onLogs }: Props) {
@@ -250,6 +221,12 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                           {badgeInfo.label}
                         </Badge>
                       )}
+                    </div>
+                    {/* Mobile-only resource summary — CPU/MEM columns are hidden below sm */}
+                    <div className="text-xs text-muted-foreground sm:hidden mt-0.5">
+                      {cpuPct != null && `CPU ${cpuPct}%`}
+                      {cpuPct != null && memPct != null && ' · '}
+                      {memPct != null && `MEM ${memPct}%`}
                     </div>
                   </TableCell>
                   <TableCell>

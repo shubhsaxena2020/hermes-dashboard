@@ -2,17 +2,12 @@ import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import type { BadgeVariant, HardwareUsage, StatusResponse } from '@/lib/api'
-import { progressIndicatorClass, TLS_CRITICAL_DAYS, TLS_EXPIRING_SOON_DAYS } from '@/lib/color-threshold'
+import type { HardwareUsage, StatusResponse } from '@/lib/api'
+import { progressIndicatorClass, TLS_EXPIRING_SOON_DAYS } from '@/lib/color-threshold'
 import { formatUptime } from '@/lib/time'
 import { ExternalLink } from 'lucide-react'
 
-function certBadgeVariant(daysRemaining?: number): BadgeVariant {
-  if (daysRemaining == null) return 'destructive'
-  if (daysRemaining < TLS_CRITICAL_DAYS) return 'destructive'
-  if (daysRemaining < TLS_EXPIRING_SOON_DAYS) return 'secondary'
-  return 'outline'
-}
+import { certBadgeVariant } from '@/lib/badge-utils'
 
 function HealthRow({ label, pct, detail }: { label: string; pct: number; detail: string }) {
   return (

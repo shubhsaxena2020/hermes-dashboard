@@ -66,6 +66,8 @@ committed to git).
 - **iter-94** — Container action loading indicator: Start, Stop, and Restart buttons now show a spinning Loader2 icon while the API call is in flight, giving users clear visual feedback that their action is processing instead of just a disabled button.
 - **iter-95** — Filter Escape shortcut: pressing Escape in the container name filter or log line filter instantly clears the filter text, matching standard filterable-list UX patterns and improving keyboard workflow.
 - **iter-97** — Redundant aria-hidden removal: removed `aria-hidden` from `<main>` when the mobile sidebar is open; `inert` already provides both keyboard focus blocking and accessibility tree exclusion, so the duplicate `aria-hidden` was unnecessary and sent mixed signals to assistive technology.
+- **iter-98** — Mobile container resource summary: added a compact CPU% / MEM% line below each container name on screens below the `sm` breakpoint, so operators on mobile can see per-container resource usage without switching to desktop. The dedicated CPU and MEM columns remain hidden on mobile to avoid table overflow; this line fills the visibility gap.
+- **iter-99** — Badge utility extraction: extracted `resourceBadgeInfo` and `certBadgeVariant` into shared `src/lib/badge-utils.ts`, removed local duplicates from ContainerTable and OverviewSection, and added vitest with 9 unit tests covering both functions.
 
 ### How the GCP credential is handled
 
