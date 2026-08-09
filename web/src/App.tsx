@@ -120,6 +120,14 @@ function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [sidebarOpen])
 
+  // Update document title with section name and connection state so the
+  // browser tab bar is useful when multiple tabs are open.
+  useEffect(() => {
+    const sectionLabel = section === 'overview' ? 'Overview' : 'VPS'
+    const suffix = error ? ' ⚠' : ''
+    document.title = `${sectionLabel}${suffix} — VPS Control`
+  }, [section, error])
+
   // Focus management: focus close button when sidebar opens, restore to hamburger when it closes
   useEffect(() => {
     if (sidebarOpen) {

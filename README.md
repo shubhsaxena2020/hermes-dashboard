@@ -53,6 +53,7 @@ committed to git).
 - **iter-81** — Container CPU/MEM columns: moved CPU and MEM data from inline bars in the name cell to dedicated right-aligned columns with percentage text and compact progress bars, decluttering the name cell and completing the sort-controls-to-visual-columns loop.
 - **iter-82** — Container table mobile responsiveness: CPU and MEM columns now hide on screens below the sm breakpoint (640px), reducing the table from 5 to 3 visible columns on mobile for easier scrolling without horizontal overflow.
 - **iter-84** — TLS threshold constants: extracted hardcoded 14-day and 30-day expiry thresholds from OverviewSection into named constants in color-threshold.ts, eliminating threshold drift between the per-cert badge and the summary badge.
+- **iter-85** — Document title: browser tab now shows the active section ("Overview" / "VPS") and a ⚠ indicator when the backend connection is stale, so users can identify the dashboard tab and its health at a glance among many open tabs.
 - **iter-83** — TLS health summary: added a count badge to the TLS certificates card header (e.g. "6/6 OK", "5 OK · 1 expiring", "1 error") for at-a-glance certificate health visibility. Also documented the shared threshold alignment between ContainerTable's resourceBadgeVariant and color-threshold.ts.
 
 ### How the GCP credential is handled
