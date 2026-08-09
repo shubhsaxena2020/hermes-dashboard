@@ -87,10 +87,20 @@ function App() {
   const hamburgerRef = useRef<HTMLButtonElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-  // re-render every second so the "updated Xs ago" note stays live
+  // re-render every second so the "updated Xs ago" note stays live,
+  // but pause while the tab is hidden to save CPU cycles.
   useEffect(() => {
-    const id = window.setInterval(() => forceTick((n) => n + 1), 1000)
-    return () => window.clearInterval(id)
+    let id: number | null = null
+    function start() { id = window.setInterval(() => forceTick((n) => n + 1), 1000) }
+    function stop() { if (id != null) { window.clearInterval(id); id = null } }
+    function onVisibility() { if (document.hidden) stop(); else start() }
+
+    start()
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility)
+      stop()
+    }
   }, [])
 
   // Version never changes during a running session -- fetch once, not on

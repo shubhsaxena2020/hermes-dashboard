@@ -57,6 +57,7 @@ committed to git).
 - **iter-85** — Document title: browser tab now shows the active section ("Overview" / "VPS") and a ⚠ indicator when the backend connection is stale, so users can identify the dashboard tab and its health at a glance among many open tabs.
 - **iter-86** — Connection-lost banner: added a prominent amber alert banner that appears above content when the backend is unreachable, replacing the tiny toolbar-only indicator. Uses role="alert" for screen reader announcement and auto-dismisses when connection restores.
 - **iter-87** — Container table empty state: added a centered "No containers match ..." message when the name filter matches zero containers, replacing the empty table body with clear feedback.
+- **iter-88** — Visibility-aware polling: status poll (5s) and timeAgo tick (1s) now pause when the browser tab is hidden, and immediately refresh when the tab becomes visible again. Saves bandwidth and battery while providing instant freshness on tab switch.
 
 ### How the GCP credential is handled
 

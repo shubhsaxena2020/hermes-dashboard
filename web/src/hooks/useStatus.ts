@@ -28,8 +28,28 @@ export function useStatus() {
   useEffect(() => {
     refresh()
     timer.current = window.setInterval(refresh, POLL_INTERVAL_MS)
+
+    function handleVisibility() {
+      if (document.hidden) {
+        // Tab hidden — pause polling to save bandwidth
+        if (timer.current != null) {
+          window.clearInterval(timer.current)
+          timer.current = null
+        }
+      } else {
+        // Tab visible again — refresh immediately and resume polling
+        refresh()
+        if (timer.current == null) {
+          timer.current = window.setInterval(refresh, POLL_INTERVAL_MS)
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibility)
+
     return () => {
-      if (timer.current) window.clearInterval(timer.current)
+      document.removeEventListener('visibilitychange', handleVisibility)
+      if (timer.current != null) window.clearInterval(timer.current)
     }
   }, [])
 
