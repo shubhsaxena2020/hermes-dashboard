@@ -25,6 +25,7 @@ committed to git).
 - **iter-53** — Architecture: extracted sidebar navigation into dedicated Sidebar.tsx component, reducing App.tsx from 107 to 78 lines.
 - **iter-54** — Loading skeleton: added skeleton placeholder for initial data fetch.
 - **iter-55** — Responsive sidebar: added hamburger menu for mobile with slide-in overlay, keyboard accessibility (Escape key, focus management), and responsive main padding.
+- **iter-56** — Error boundary: added class-based ErrorBoundary component wrapping section content; catches render crashes with a labeled recovery card and "Try again" button.
 
 ### How the GCP credential is handled
 

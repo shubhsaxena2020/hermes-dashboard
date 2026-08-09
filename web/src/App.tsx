@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useStatus } from '@/hooks/useStatus'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { OverviewSection } from '@/components/OverviewSection'
 import { OracleSection } from '@/components/OracleSection'
 import { Sidebar, type SectionKey } from '@/components/Sidebar'
@@ -175,8 +176,10 @@ function App() {
                 </span>
               )}
             </div>
-            {section === 'overview' && <OverviewSection data={data} />}
-            {section === 'oracle' && <OracleSection oracle={data.oracle} refresh={refresh} />}
+            <ErrorBoundary key={section} sectionLabel={section === 'overview' ? 'Overview' : 'VPS'}>
+              {section === 'overview' && <OverviewSection data={data} />}
+              {section === 'oracle' && <OracleSection oracle={data.oracle} refresh={refresh} />}
+            </ErrorBoundary>
           </>
         )}
       </main>
