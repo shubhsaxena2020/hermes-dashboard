@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { progressIndicatorClass, responseTimeClass } from '@/lib/color-threshold'
+import { progressIndicatorClass, responseTimeClass, diskUsageWarning } from '@/lib/color-threshold'
 
 describe('progressIndicatorClass', () => {
   it('returns empty string for low usage', () => {
@@ -38,5 +38,31 @@ describe('responseTimeClass', () => {
     expect(responseTimeClass(500)).toBe('text-red-500')
     expect(responseTimeClass(750)).toBe('text-red-500')
     expect(responseTimeClass(1000)).toBe('text-red-500')
+  })
+})
+
+describe('diskUsageWarning', () => {
+  it('returns null for low disk usage', () => {
+    expect(diskUsageWarning(0)).toBeNull()
+    expect(diskUsageWarning(50)).toBeNull()
+    expect(diskUsageWarning(79)).toBeNull()
+  })
+
+  it('returns high-usage warning at 80%', () => {
+    expect(diskUsageWarning(80)).toBe('Disk usage is high — consider freeing space')
+  })
+
+  it('returns high-usage warning between 80% and 94%', () => {
+    expect(diskUsageWarning(85)).toBe('Disk usage is high — consider freeing space')
+    expect(diskUsageWarning(94)).toBe('Disk usage is high — consider freeing space')
+  })
+
+  it('returns critical warning at 95%', () => {
+    expect(diskUsageWarning(95)).toBe('Disk critically full — immediate action required')
+  })
+
+  it('returns critical warning above 95%', () => {
+    expect(diskUsageWarning(99)).toBe('Disk critically full — immediate action required')
+    expect(diskUsageWarning(100)).toBe('Disk critically full — immediate action required')
   })
 })

@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { ArrowDown, ArrowUp, Check, Copy, Loader2, RefreshCw } from 'lucide-react'
+import { ArrowDown, ArrowUp, Check, Copy, Container, Loader2, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -394,10 +394,30 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
               </Fragment>
             )
           })}
-          {sorted.length === 0 && nameFilter && (
+          {sorted.length === 0 && (
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-8">
-                No containers match &ldquo;{nameFilter}&rdquo;
+              <TableCell colSpan={5} className="py-10">
+                <div className="flex flex-col items-center justify-center text-center" role="status">
+                  <Container className="size-10 text-muted-foreground/50 mb-3" aria-hidden="true" />
+                  {nameFilter ? (
+                    <>
+                      <p className="text-sm text-muted-foreground">
+                        No containers match &ldquo;{nameFilter}&rdquo;
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setNameFilter('')}
+                        className="text-xs text-primary hover:underline mt-2"
+                      >
+                        Clear filter
+                      </button>
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No containers found
+                    </p>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           )}
