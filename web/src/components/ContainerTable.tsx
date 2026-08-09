@@ -359,7 +359,15 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                               aria-label="Filter log lines"
                               value={filter}
                               onChange={(e) => setLogFilter((f) => ({ ...f, [c.name]: e.target.value }))}
-                              onKeyDown={(e) => { if (e.key === 'Escape') setLogFilter((f) => ({ ...f, [c.name]: '' })) }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Escape') {
+                                  if (logFilter[c.name]) {
+                                    setLogFilter((f) => ({ ...f, [c.name]: '' }))
+                                  } else {
+                                    toggleLogs(c.name)
+                                  }
+                                }
+                              }}
                               className="h-7 text-xs max-w-xs"
                             />
                             <Button
