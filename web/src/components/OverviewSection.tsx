@@ -90,16 +90,31 @@ export function OverviewSection({ data }: { data: StatusResponse }) {
           </CardHeader>
           <CardContent>
             <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-              {(data.tls || []).map((cert) => (
-                <div key={cert.domain} className="flex items-center justify-between gap-2 rounded-md border px-3 py-2">
-                  <dt className="truncate text-muted-foreground">{cert.domain.replace('.shubhbuilds.com', '')}</dt>
-                  <dd>
-                    <Badge variant={cert.error ? 'destructive' : certBadgeVariant(cert.daysRemaining)}>
-                      {cert.error ? 'error' : `${cert.daysRemaining}d`}
-                    </Badge>
-                  </dd>
-                </div>
-              ))}
+              {(data.tls || []).map((cert) => {
+                const expiryDate = cert.validTo ? new Date(cert.validTo) : null
+                const expiryLabel = expiryDate
+                  ? expiryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                  : null
+                return (
+                  <div
+                    key={cert.domain}
+                    className="flex items-center justify-between gap-2 rounded-md border px-3 py-2"
+                    title={cert.issuer ? `Issuer: ${cert.issuer}` : undefined}
+                  >
+                    <div className="min-w-0">
+                      <dt className="truncate text-muted-foreground text-sm">{cert.domain.replace('.shubhbuilds.com', '')}</dt>
+                      {expiryLabel && (
+                        <dd className="text-xs text-muted-foreground/70 mt-0.5">Expires {expiryLabel}</dd>
+                      )}
+                    </div>
+                    <dd className="shrink-0">
+                      <Badge variant={cert.error ? 'destructive' : certBadgeVariant(cert.daysRemaining)}>
+                        {cert.error ? 'error' : `${cert.daysRemaining}d`}
+                      </Badge>
+                    </dd>
+                  </div>
+                )
+              })}
             </dl>
           </CardContent>
         </Card>
