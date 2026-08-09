@@ -177,6 +177,7 @@ function App() {
         version={version}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        downCount={data?.oracle.containers.filter((c) => !c.up).length ?? 0}
         ref={closeButtonRef}
       />
 

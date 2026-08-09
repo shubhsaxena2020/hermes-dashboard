@@ -17,10 +17,11 @@ interface SidebarProps {
   version: { commit: string | null; date: string | null } | null
   isOpen?: boolean
   onClose?: () => void
+  downCount?: number
 }
 
 export const Sidebar = forwardRef<HTMLButtonElement, SidebarProps>(
-  function Sidebar({ section, onSectionChange, theme, onThemeToggle, version, isOpen, onClose }, closeButtonRef) {
+  function Sidebar({ section, onSectionChange, theme, onThemeToggle, version, isOpen, onClose, downCount }, closeButtonRef) {
     return (
       <nav
         className={cn(
@@ -50,12 +51,22 @@ export const Sidebar = forwardRef<HTMLButtonElement, SidebarProps>(
             aria-current={section === item.key ? 'page' : undefined}
           >
             {item.label}
-            <kbd
-              className="text-[10px] text-muted-foreground/60 border border-border rounded px-1 py-0 font-mono flex-shrink-0 hidden md:inline-block"
-              aria-hidden="true"
-            >
-              {item.shortcut}
-            </kbd>
+            <span className="flex items-center gap-1.5">
+              {item.key === 'oracle' && (downCount ?? 0) > 0 && (
+                <span
+                  className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-medium"
+                  aria-label={`${downCount} container${downCount !== 1 ? 's' : ''} down`}
+                >
+                  {downCount}
+                </span>
+              )}
+              <kbd
+                className="text-[10px] text-muted-foreground/60 border border-border rounded px-1 py-0 font-mono flex-shrink-0 hidden md:inline-block"
+                aria-hidden="true"
+              >
+                {item.shortcut}
+              </kbd>
+            </span>
           </button>
         ))}
         <button

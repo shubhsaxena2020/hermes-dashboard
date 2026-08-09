@@ -70,6 +70,7 @@ committed to git).
 - **iter-99** — Badge utility extraction: extracted `resourceBadgeInfo` and `certBadgeVariant` into shared `src/lib/badge-utils.ts`, removed local duplicates from ContainerTable and OverviewSection, and added vitest with 9 unit tests covering both functions.
 - **iter-100** — Log auto-refresh: added a toggle button next to the log filter that polls container logs every 15 seconds while active, with a spinning RefreshCw icon and "Live" label. Auto-refresh clears when the log panel is closed. Eliminates the manual open/close/reopen cycle for monitoring live log output.
 - **iter-101** — Log line count indicator: the log panel now shows a line count ("42 lines" or "42 of 3,847 lines" when filtering), mirroring the container name filter count pattern, and adds `role="log"` for screen reader semantics.
+- **iter-102** — Sidebar down-container badge: the VPS nav item in the sidebar now shows a red count badge (e.g. "2") when containers are down, making the signal visible from any section without switching tabs. Badge includes an aria-label for screen reader announcement.
 
 ### How the GCP credential is handled
 
