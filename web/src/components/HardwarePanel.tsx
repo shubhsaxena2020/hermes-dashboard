@@ -1,6 +1,12 @@
 import { Progress } from '@/components/ui/progress'
 import type { HardwareUsage } from '@/lib/api'
 
+function progressIndicatorClass(pct: number): string {
+  if (pct >= 80) return 'bg-destructive'
+  if (pct >= 60) return 'bg-yellow-500'
+  return ''
+}
+
 export function HardwarePanel({ usage }: { usage?: HardwareUsage | null }) {
   const memPct = usage?.memTotalMb ? Math.round(((usage.memUsedMb ?? 0) / usage.memTotalMb) * 100) : 0
   const diskPct = usage?.diskPct ? Number(usage.diskPct.replace('%', '')) : 0
@@ -13,20 +19,20 @@ export function HardwarePanel({ usage }: { usage?: HardwareUsage | null }) {
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span className="text-muted-foreground">Memory</span>
-              <span>
-                {usage.memUsedMb ?? '?'} / {usage.memTotalMb ?? '?'} MB
+              <span className="tabular-nums">
+                {usage.memUsedMb ?? '?'} / {usage.memTotalMb ?? '?'} MB ({memPct}%)
               </span>
             </div>
-            <Progress value={memPct} />
+            <Progress value={memPct} indicatorClassName={progressIndicatorClass(memPct)} />
           </div>
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span className="text-muted-foreground">Disk</span>
-              <span>
+              <span className="tabular-nums">
                 {usage.diskUsed ?? '?'} / {usage.diskTotal ?? '?'} ({usage.diskPct ?? '?'})
               </span>
             </div>
-            <Progress value={diskPct} />
+            <Progress value={diskPct} indicatorClassName={progressIndicatorClass(diskPct)} />
           </div>
         </div>
       ) : (

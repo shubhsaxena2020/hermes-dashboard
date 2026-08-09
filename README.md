@@ -26,6 +26,7 @@ committed to git).
 - **iter-54** — Loading skeleton: added skeleton placeholder for initial data fetch.
 - **iter-55** — Responsive sidebar: added hamburger menu for mobile with slide-in overlay, keyboard accessibility (Escape key, focus management), and responsive main padding.
 - **iter-56** — Error boundary: added class-based ErrorBoundary component wrapping section content; catches render crashes with a labeled recovery card and "Try again" button.
+- **iter-57** — Hardware panel visual feedback: added color-coded progress bars (yellow ≥60%, red ≥80%) and inline memory percentage for at-a-glance resource health.
 
 ### How the GCP credential is handled
 
