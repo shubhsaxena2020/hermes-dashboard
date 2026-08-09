@@ -43,36 +43,40 @@ app.use(express.static(webDist))
 app.use(express.json())
 
 app.get('/api/status', async (req, res) => {
-  const [oracleContainersRaw, oracleStats, oracleUsage, tls, ownMachineType] = await Promise.all([
-    oracleStatus.getOracleContainerHealth().catch((err) => ({ error: err.message })),
-    oracleStatus.getOracleContainerStats().catch(() => ({})),
-    oracleHardware.getHardwareUsage().catch(() => null),
-    tlsStatus.getTlsStatus().catch(() => []),
-    costEstimate.getOwnMachineType().catch(() => null),
-  ])
+  try {
+    const [oracleContainersRaw, oracleStats, oracleUsage, tls, ownMachineType] = await Promise.all([
+      oracleStatus.getOracleContainerHealth().catch((err) => ({ error: err.message })),
+      oracleStatus.getOracleContainerStats().catch(() => ({})),
+      oracleHardware.getHardwareUsage().catch(() => null),
+      tlsStatus.getTlsStatus().catch(() => []),
+      costEstimate.getOwnMachineType().catch(() => null),
+    ])
 
-  const oracleContainers = Array.isArray(oracleContainersRaw)
-    ? mergeStats(oracleContainersRaw, oracleStats)
-    : oracleContainersRaw
+    const oracleContainers = Array.isArray(oracleContainersRaw)
+      ? mergeStats(oracleContainersRaw, oracleStats)
+      : oracleContainersRaw
 
-  const result = {
-    oracle: {
-      containers: oracleContainers,
-      controllable: oracleDocker.CONTROLLABLE_CONTAINERS,
-      viewable: oracleStatus.VIEWABLE_CONTAINERS,
-      usage: oracleUsage,
-    },
-    tls,
-    costs: {
-      main: {
-        machineType: ownMachineType,
-        monthlyEstimate: costEstimate.monthlyEstimate(ownMachineType),
-        alwaysOn: true,
+    const result = {
+      oracle: {
+        containers: oracleContainers,
+        controllable: oracleDocker.CONTROLLABLE_CONTAINERS,
+        viewable: oracleStatus.VIEWABLE_CONTAINERS,
+        usage: oracleUsage,
       },
-    },
-  }
+      tls,
+      costs: {
+        main: {
+          machineType: ownMachineType,
+          monthlyEstimate: costEstimate.monthlyEstimate(ownMachineType),
+          alwaysOn: true,
+        },
+      },
+    }
 
-  res.json(result)
+    res.json(result)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 app.post('/api/oracle/containers/:name/:action', async (req, res) => {
