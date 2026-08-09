@@ -183,7 +183,6 @@ function App() {
       <main
         id="main-content"
         className="flex-1 p-4 md:p-8 max-w-5xl"
-        aria-hidden={sidebarOpen || undefined}
         inert={sidebarOpen || undefined}
       >
         <a

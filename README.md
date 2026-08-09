@@ -65,6 +65,7 @@ committed to git).
 - **iter-93** — Container filter clear button: added a × button inside the filter input that appears when text is active, enabling one-click filter reset instead of manual select-all-delete.
 - **iter-94** — Container action loading indicator: Start, Stop, and Restart buttons now show a spinning Loader2 icon while the API call is in flight, giving users clear visual feedback that their action is processing instead of just a disabled button.
 - **iter-95** — Filter Escape shortcut: pressing Escape in the container name filter or log line filter instantly clears the filter text, matching standard filterable-list UX patterns and improving keyboard workflow.
+- **iter-97** — Redundant aria-hidden removal: removed `aria-hidden` from `<main>` when the mobile sidebar is open; `inert` already provides both keyboard focus blocking and accessibility tree exclusion, so the duplicate `aria-hidden` was unnecessary and sent mixed signals to assistive technology.
 
 ### How the GCP credential is handled
 
