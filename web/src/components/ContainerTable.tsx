@@ -164,9 +164,16 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                     )}
                   </TableCell>
                   <TableCell>
-                    <span className={c.up ? 'text-green-500' : 'text-red-500'}>{c.status}</span>
+                    <span className="flex items-center gap-1.5" aria-label={c.up ? 'Running' : 'Stopped'}>
+                      <span
+                        className={`w-2 h-2 rounded-full shrink-0 ${c.up ? 'bg-green-500' : 'bg-red-500'}`}
+                        aria-hidden="true"
+                      />
+                      <span className={c.up ? 'text-green-500' : 'text-red-500'}>{c.status}</span>
+                    </span>
                   </TableCell>
-                  <TableCell className="text-right space-x-2">
+                  <TableCell className="text-right whitespace-normal">
+                    <div className="flex flex-wrap justify-end gap-1.5">
                     {canControl && !c.up && (
                       <Button size="default" variant="default" disabled={isPending} onClick={() => runAction(c.name, 'start')}>
                         Start
@@ -197,6 +204,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                         {logState ? 'Hide logs' : 'Logs'}
                       </Button>
                     )}
+                    </div>
                   </TableCell>
                 </TableRow>
                 {logState && (

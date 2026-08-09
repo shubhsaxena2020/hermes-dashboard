@@ -43,6 +43,8 @@ committed to git).
 - **iter-70** — Keyboard shortcut hints: added `<kbd>` visual indicators next to sidebar nav items (Alt+1, Alt+2) on desktop for discoverability.
 - **iter-71** — Container resource bars: added inline CPU% and Memory% progress bars to each container row in the infrastructure table, replacing raw text with color-coded visual indicators for at-a-glance resource monitoring.
 - **iter-72** — Down-container names: Overview VPS card now shows which containers are down by name, reducing the need to switch to the VPS tab for status triage.
+- **iter-73** — Container actions responsive wrap: action buttons (Start/Stop/Restart/Logs) in the infrastructure table now wrap on narrow viewports instead of overflowing, fixing a mobile responsiveness regression.
+- **iter-75** — Container status accessibility: added colored dot indicator to the status column for colorblind users (non-color signaling).
 
 ### How the GCP credential is handled
 
