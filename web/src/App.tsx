@@ -52,6 +52,7 @@ function App() {
               'px-5 py-2 text-sm cursor-pointer border-l-2 border-transparent text-left text-muted-foreground hover:bg-accent',
               section === item.key && 'border-primary text-foreground bg-accent',
             )}
+            aria-current={section === item.key ? 'page' : undefined}
           >
             {item.label}
           </button>
@@ -76,13 +77,13 @@ function App() {
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : (
           <>
-            <div className="flex items-center justify-end mb-2 gap-2">
+            <div className="flex items-center justify-end mb-2 gap-2 flex-wrap">
               <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
               <Button
-                size="sm"
+                size="default"
                 variant="ghost"
                 onClick={refresh}
-                className="text-muted-foreground h-7 gap-1.5"
+                className="text-muted-foreground"
                 aria-label="Refresh status"
               >
                 <RefreshCw className="size-3" />

@@ -143,14 +143,14 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                   </TableCell>
                   <TableCell className="text-right space-x-2">
                     {canControl && !c.up && (
-                      <Button size="sm" variant="default" disabled={isPending} onClick={() => runAction(c.name, 'start')}>
+                      <Button size="default" variant="default" disabled={isPending} onClick={() => runAction(c.name, 'start')}>
                         Start
                       </Button>
                     )}
                     {canControl && c.up && (
                       <>
                         <Button
-                          size="sm"
+                          size="default"
                           variant="destructive"
                           disabled={isPending}
                           onClick={() => setConfirmTarget({ name: c.name, action: 'stop' })}
@@ -158,7 +158,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                           Stop
                         </Button>
                         <Button
-                          size="sm"
+                          size="default"
                           variant="secondary"
                           disabled={isPending}
                           onClick={() => setConfirmTarget({ name: c.name, action: 'restart' })}
@@ -168,7 +168,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                       </>
                     )}
                     {canView && (
-                      <Button size="sm" variant="outline" onClick={() => toggleLogs(c.name)}>
+                      <Button size="default" variant="outline" onClick={() => toggleLogs(c.name)}>
                         {logState ? 'Hide logs' : 'Logs'}
                       </Button>
                     )}
