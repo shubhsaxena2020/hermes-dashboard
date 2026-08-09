@@ -23,6 +23,8 @@ committed to git).
 - **iter-51** — Error state tracking: useStatus hook now surfaces poll errors; "Stale — poll failed" indicator added to toolbar; manual Refresh button with aria-label added.
 - **iter-52** — UI polish: upgraded Refresh to shadcn Button with RefreshCw icon; normalized all action buttons to size="default" (sm→default); added aria-current on nav items; added flex-wrap on toolbar; added Features section to README.
 - **iter-53** — Architecture: extracted sidebar navigation into dedicated Sidebar.tsx component, reducing App.tsx from 107 to 78 lines.
+- **iter-54** — Loading skeleton: added skeleton placeholder for initial data fetch.
+- **iter-55** — Responsive sidebar: added hamburger menu for mobile with slide-in overlay, keyboard accessibility (Escape key, focus management), and responsive main padding.
 
 ### How the GCP credential is handled
 

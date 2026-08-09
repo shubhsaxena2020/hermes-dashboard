@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCw, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -18,7 +18,7 @@ function timeAgo(ts: number | null) {
 
 function LoadingSkeleton() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" role="status" aria-label="Loading dashboard">
       <Skeleton className="h-7 w-24" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card>
@@ -73,6 +73,9 @@ function App() {
   const [, forceTick] = useState(0)
   const [version, setVersion] = useState<{ commit: string | null; date: string | null } | null>(null)
   const { theme, setTheme } = useTheme()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   // re-render every second so the "updated Xs ago" note stays live
   useEffect(() => {
@@ -86,17 +89,69 @@ function App() {
     api.version().then(setVersion).catch(() => setVersion(null))
   }, [])
 
+  // Close sidebar on Escape key
+  useEffect(() => {
+    if (!sidebarOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSidebarOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [sidebarOpen])
+
+  // Focus management: focus close button when sidebar opens, restore to hamburger when it closes
+  useEffect(() => {
+    if (sidebarOpen) {
+      closeButtonRef.current?.focus()
+    } else {
+      hamburgerRef.current?.focus()
+    }
+  }, [sidebarOpen])
+
   return (
     <div className="flex min-h-screen bg-background text-foreground">
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Hamburger button — mobile only */}
+      <button
+        ref={hamburgerRef}
+        type="button"
+        onClick={() => setSidebarOpen((o) => !o)}
+        className="fixed top-4 left-4 z-[60] p-2 rounded-md bg-card border shadow-md md:hidden"
+        aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
+      >
+        {sidebarOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+      </button>
+
       <Sidebar
         section={section}
         onSectionChange={setSection}
         theme={theme}
         onThemeToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         version={version}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        ref={closeButtonRef}
       />
 
-      <main className="flex-1 p-8 max-w-5xl">
+      <main
+        id="main-content"
+        className="flex-1 p-4 md:p-8 max-w-5xl"
+        aria-hidden={sidebarOpen}
+      >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded"
+        >
+          Skip to main content
+        </a>
         {!data ? (
           <LoadingSkeleton />
         ) : (
@@ -104,6 +159,7 @@ function App() {
             <div className="flex items-center justify-end mb-2 gap-2 flex-wrap">
               <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
               <Button
+                type="button"
                 size="default"
                 variant="ghost"
                 onClick={refresh}
