@@ -7,3 +7,10 @@ export function progressIndicatorClass(pct: number): string {
   if (pct >= 60) return 'bg-yellow-500'
   return ''
 }
+
+/** Color class for API response time text. */
+export function responseTimeClass(ms: number): string {
+  if (ms >= 500) return 'text-red-500'
+  if (ms >= 200) return 'text-yellow-500'
+  return 'text-green-500'
+}

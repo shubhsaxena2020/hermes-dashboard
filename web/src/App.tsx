@@ -11,6 +11,7 @@ import { OracleSection } from '@/components/OracleSection'
 import { Sidebar, type SectionKey } from '@/components/Sidebar'
 import { api } from '@/lib/api'
 import { timeAgo } from '@/lib/time'
+import { responseTimeClass } from '@/lib/color-threshold'
 
 function LoadingSkeleton() {
   return (
@@ -209,7 +210,7 @@ function App() {
               />
               <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
               {responseMs != null && (
-                <span className="text-xs text-muted-foreground" title="API response time">
+                <span className={`text-xs font-medium tabular-nums ${responseTimeClass(responseMs)}`} title={`API response time: ${responseMs}ms`}>
                   {responseMs}ms
                 </span>
               )}
