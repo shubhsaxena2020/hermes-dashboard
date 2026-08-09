@@ -49,6 +49,7 @@ committed to git).
 - **iter-77** — VPS tab container health: added "{up}/{total} up" badge to the VPS tab header for at-a-glance container health visibility.
 - **iter-78** — Container table sorting: added clickable sort controls (Name, Status, CPU, MEM) above the infrastructure table with direction indicators, enabling quick identification of resource-heavy or stopped containers.
 - **iter-79** — Sort controls responsive wrap: added flex-wrap to the container table sort bar so sort buttons wrap on narrow viewports instead of overflowing, matching the action-button wrap pattern from iter-73.
+- **iter-80** — Container name filter: added a search input above the sort bar in the infrastructure table, filtering containers by name with a live count indicator (e.g. "5 of 19") when a filter is active.
 
 ### How the GCP credential is handled
 

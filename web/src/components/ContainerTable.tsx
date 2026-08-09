@@ -77,6 +77,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
   const [logFilter, setLogFilter] = useState<Record<string, string>>({})
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortAsc, setSortAsc] = useState(true)
+  const [nameFilter, setNameFilter] = useState('')
 
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
@@ -87,7 +88,11 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
     }
   }
 
-  const sorted = [...containers].sort((a, b) => {
+  const filtered = nameFilter
+    ? containers.filter((c) => c.name.toLowerCase().includes(nameFilter.toLowerCase()))
+    : containers
+
+  const sorted = [...filtered].sort((a, b) => {
     let cmp = 0
     switch (sortKey) {
       case 'name':
@@ -138,6 +143,20 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
 
   return (
     <>
+      <div className="flex flex-wrap items-center gap-2 mb-3">
+        <Input
+          placeholder="Filter containers…"
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+          className="h-7 text-xs max-w-xs"
+          aria-label="Filter containers by name"
+        />
+        {nameFilter && (
+          <span className="text-xs text-muted-foreground">
+            {sorted.length} of {containers.length}
+          </span>
+        )}
+      </div>
       <div className="flex flex-wrap items-center gap-1.5 mb-3">
         <span className="text-xs text-muted-foreground mr-1">Sort:</span>
         {SORT_OPTIONS.map((opt) => (
