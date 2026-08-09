@@ -66,10 +66,30 @@ function parseMemPercent(mem?: string): number | null {
 // Resource-usage thresholds mirror progressIndicatorClass in color-threshold.ts
 // (80% destructive, 60% warning) so both progress bars and badges use the same
 // severity scale. Keep these in sync if either function's breakpoints change.
-function resourceBadgeVariant(pct: number | null): BadgeVariant | null {
-  if (pct == null) return null
-  if (pct >= 80) return 'destructive'
-  if (pct >= 60) return 'secondary'
+// Examines CPU and MEM independently — badge label names the stressed resource(s)
+// so operators know which metric to investigate, even on mobile where the CPU/MEM
+// columns are hidden.
+function resourceBadgeInfo(
+  cpuPct: number | null,
+  memPct: number | null,
+): { variant: BadgeVariant; label: string } | null {
+  const cpuHigh = cpuPct != null && cpuPct >= 80
+  const memHigh = memPct != null && memPct >= 80
+  const cpuElev = cpuPct != null && cpuPct >= 60
+  const memElev = memPct != null && memPct >= 60
+
+  if (cpuHigh || memHigh) {
+    const parts = []
+    if (cpuHigh) parts.push('CPU')
+    if (memHigh) parts.push('MEM')
+    return { variant: 'destructive', label: `${parts.join('+')} high` }
+  }
+  if (cpuElev || memElev) {
+    const parts = []
+    if (cpuElev) parts.push('CPU')
+    if (memElev) parts.push('MEM')
+    return { variant: 'secondary', label: `${parts.join('+')} elevated` }
+  }
   return null
 }
 
@@ -217,16 +237,16 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                 : logState
             const cpuPct = parseCpuPercent(c.cpu)
             const memPct = parseMemPercent(c.mem)
-            const resourceVariant = resourceBadgeVariant(Math.max(cpuPct ?? 0, memPct ?? 0))
+            const badgeInfo = resourceBadgeInfo(cpuPct, memPct)
             return (
               <Fragment key={c.name}>
                 <TableRow>
                   <TableCell>
                     <div className="font-medium flex items-center gap-2">
                       {c.name}
-                      {resourceVariant && (
-                        <Badge variant={resourceVariant} className="text-[10px] px-1.5 py-0">
-                          high usage
+                      {badgeInfo && (
+                        <Badge variant={badgeInfo.variant} className="text-[10px] px-1.5 py-0">
+                          {badgeInfo.label}
                         </Badge>
                       )}
                     </div>
