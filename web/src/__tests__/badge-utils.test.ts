@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { resourceBadgeInfo, certBadgeVariant } from '@/lib/badge-utils'
+import { resourceBadgeInfo, certBadgeVariant, tlsSummaryBadge } from '@/lib/badge-utils'
+import type { TlsCertStatus } from '@/lib/api'
 
 describe('resourceBadgeInfo', () => {
   it('returns null when both inputs are null', () => {
@@ -47,5 +48,56 @@ describe('certBadgeVariant', () => {
 
   it('returns outline when daysRemaining >= 30', () => {
     expect(certBadgeVariant(45)).toBe('outline')
+  })
+})
+
+describe('tlsSummaryBadge', () => {
+  it('returns null for an empty cert array', () => {
+    expect(tlsSummaryBadge([])).toBeNull()
+  })
+
+  it('returns outline when all certs are healthy', () => {
+    const certs: TlsCertStatus[] = [
+      { domain: 'a.example.com', daysRemaining: 60 },
+      { domain: 'b.example.com', daysRemaining: 45 },
+    ]
+    expect(tlsSummaryBadge(certs)).toEqual({
+      variant: 'outline',
+      label: '2/2 OK',
+    })
+  })
+
+  it('returns destructive when a cert has an error', () => {
+    const certs: TlsCertStatus[] = [
+      { domain: 'a.example.com', daysRemaining: 60 },
+      { domain: 'b.example.com', error: 'connection refused' },
+    ]
+    expect(tlsSummaryBadge(certs)).toEqual({
+      variant: 'destructive',
+      label: '1 error',
+    })
+  })
+
+  it('returns plural "errors" label when multiple certs fail', () => {
+    const certs: TlsCertStatus[] = [
+      { domain: 'a.example.com', error: 'timeout' },
+      { domain: 'b.example.com', error: 'expired' },
+      { domain: 'c.example.com', daysRemaining: 60 },
+    ]
+    expect(tlsSummaryBadge(certs)).toEqual({
+      variant: 'destructive',
+      label: '2 errors',
+    })
+  })
+
+  it('returns secondary with expiring label when certs are expiring soon', () => {
+    const certs: TlsCertStatus[] = [
+      { domain: 'a.example.com', daysRemaining: 60 },
+      { domain: 'b.example.com', daysRemaining: 10 },
+    ]
+    expect(tlsSummaryBadge(certs)).toEqual({
+      variant: 'secondary',
+      label: '1 OK · 1 expiring',
+    })
   })
 })

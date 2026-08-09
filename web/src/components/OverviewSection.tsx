@@ -2,12 +2,11 @@ import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { StatusResponse } from '@/lib/api'
-import { TLS_EXPIRING_SOON_DAYS } from '@/lib/color-threshold'
 import { formatUptime } from '@/lib/time'
 import { ExternalLink } from 'lucide-react'
 import { HardwarePanel } from '@/components/HardwarePanel'
 
-import { certBadgeVariant } from '@/lib/badge-utils'
+import { certBadgeVariant, tlsSummaryBadge } from '@/lib/badge-utils'
 import type { SectionKey } from '@/components/Sidebar'
 
 export function OverviewSection({ data, onNavigate }: { data: StatusResponse; onNavigate?: (section: SectionKey) => void }) {
@@ -17,6 +16,7 @@ export function OverviewSection({ data, onNavigate }: { data: StatusResponse; on
   const MAX_NAMES = 3
   const shownNames = downContainers.slice(0, MAX_NAMES)
   const overflow = downContainers.length - MAX_NAMES
+  const tlsSummary = tlsSummaryBadge(data.tls || [])
 
   return (
     <div className="space-y-6">
@@ -81,20 +81,7 @@ export function OverviewSection({ data, onNavigate }: { data: StatusResponse; on
         <Card className="sm:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">TLS certificates</CardTitle>
-            {(() => {
-              const certs = data.tls || []
-              const errored = certs.filter((c) => c.error).length
-              const expiringSoon = certs.filter((c) => !c.error && (c.daysRemaining ?? Infinity) < TLS_EXPIRING_SOON_DAYS).length
-              const healthy = certs.length - errored - expiringSoon
-              if (certs.length === 0) return null
-              const label = errored > 0
-                ? `${errored} error${errored > 1 ? 's' : ''}`
-                : expiringSoon > 0
-                  ? `${healthy} OK · ${expiringSoon} expiring`
-                  : `${healthy}/${certs.length} OK`
-              const variant = errored > 0 ? 'destructive' : expiringSoon > 0 ? 'secondary' : 'outline'
-              return <Badge variant={variant}>{label}</Badge>
-            })()}
+            {tlsSummary && <Badge variant={tlsSummary.variant}>{tlsSummary.label}</Badge>}
           </CardHeader>
           <CardContent>
             <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">

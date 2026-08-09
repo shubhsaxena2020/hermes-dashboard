@@ -1,4 +1,4 @@
-import type { BadgeVariant } from '@/lib/api'
+import type { BadgeVariant, TlsCertStatus } from '@/lib/api'
 import { TLS_CRITICAL_DAYS, TLS_EXPIRING_SOON_DAYS } from '@/lib/color-threshold'
 
 // Resource-usage thresholds mirror progressIndicatorClass in color-threshold.ts
@@ -36,4 +36,36 @@ export function certBadgeVariant(daysRemaining?: number): BadgeVariant {
   if (daysRemaining < TLS_CRITICAL_DAYS) return 'destructive'
   if (daysRemaining < TLS_EXPIRING_SOON_DAYS) return 'secondary'
   return 'outline'
+}
+
+/**
+ * Compute the TLS summary badge for an array of certificates.
+ *
+ * Returns null when the cert list is empty (nothing to show).
+ * Otherwise returns a label and variant for the overview card header:
+ *  - "N error(s)" with destructive variant when any cert has an error
+ *  - "M OK · N expiring" with secondary variant when certs are expiring
+ *  - "N/M OK" with outline variant when all certs are healthy
+ */
+export function tlsSummaryBadge(
+  certs: TlsCertStatus[],
+): { variant: BadgeVariant; label: string } | null {
+  if (certs.length === 0) return null
+
+  const errored = certs.filter((c) => c.error).length
+  const expiringSoon = certs.filter(
+    (c) => !c.error && (c.daysRemaining ?? Infinity) < TLS_EXPIRING_SOON_DAYS,
+  ).length
+  const healthy = certs.length - errored - expiringSoon
+
+  const label =
+    errored > 0
+      ? `${errored} error${errored > 1 ? 's' : ''}`
+      : expiringSoon > 0
+        ? `${healthy} OK · ${expiringSoon} expiring`
+        : `${healthy}/${certs.length} OK`
+  const variant: BadgeVariant =
+    errored > 0 ? 'destructive' : expiringSoon > 0 ? 'secondary' : 'outline'
+
+  return { variant, label }
 }
