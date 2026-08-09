@@ -32,10 +32,14 @@ function HealthRow({ label, pct, detail }: { label: string; pct: number; detail:
 
 function SystemHealth({ usage }: { usage: HardwareUsage | null }) {
   if (!usage) return <p className="text-sm text-muted-foreground">Usage unavailable.</p>
+  const cpuPct = usage.cpuUsagePct ?? 0
   const memPct = usage.memTotalMb ? Math.round(((usage.memUsedMb ?? 0) / usage.memTotalMb) * 100) : 0
   const diskPct = usage.diskPct ? Number(usage.diskPct.replace('%', '')) : 0
   return (
     <div className="space-y-3">
+      {usage.cpuUsagePct != null && (
+        <HealthRow label={`CPU (${usage.cpus ?? '?'} cores)`} pct={cpuPct} detail={`${cpuPct}%`} />
+      )}
       <HealthRow label="Memory" pct={memPct} detail={`${usage.memUsedMb ?? '?'} / ${usage.memTotalMb ?? '?'} MB`} />
       <HealthRow label="Disk" pct={diskPct} detail={`${usage.diskUsed ?? '?'} / ${usage.diskTotal ?? '?'}`} />
     </div>

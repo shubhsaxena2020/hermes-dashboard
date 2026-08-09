@@ -8,6 +8,7 @@ function progressIndicatorClass(pct: number): string {
 }
 
 export function HardwarePanel({ usage }: { usage?: HardwareUsage | null }) {
+  const cpuPct = usage?.cpuUsagePct ?? 0
   const memPct = usage?.memTotalMb ? Math.round(((usage.memUsedMb ?? 0) / usage.memTotalMb) * 100) : 0
   const diskPct = usage?.diskPct ? Number(usage.diskPct.replace('%', '')) : 0
 
@@ -15,7 +16,17 @@ export function HardwarePanel({ usage }: { usage?: HardwareUsage | null }) {
     <div className="space-y-4">
       {usage ? (
         <div className="space-y-3">
-          <div className="text-sm text-muted-foreground">CPU cores: {usage.cpus ?? '?'}</div>
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <span className="text-muted-foreground">CPU ({usage.cpus ?? '?'} cores)</span>
+              <span className="tabular-nums">
+                {usage.cpuUsagePct != null ? `${cpuPct}%` : '—'}
+              </span>
+            </div>
+            {usage.cpuUsagePct != null && (
+              <Progress value={cpuPct} indicatorClassName={progressIndicatorClass(cpuPct)} />
+            )}
+          </div>
           <div>
             <div className="flex justify-between text-sm mb-1">
               <span className="text-muted-foreground">Memory</span>

@@ -8,6 +8,7 @@ export interface ContainerInfo {
 
 export interface HardwareUsage {
   cpus: number | null
+  cpuUsagePct: number | null
   memTotalMb: number | null
   memUsedMb: number | null
   diskTotal: string | null
