@@ -16,6 +16,7 @@ committed to git).
 - **VPS tab**: live hardware usage (CPU, memory, disk), container table with start/stop/restart controls, log viewer with line filtering
 - **Dark mode**: toggle in the sidebar; defaults to system preference
 - **Auto-polling**: status refreshes every 5 seconds; manual refresh and error indicator in the toolbar
+- **Keyboard shortcuts**: Alt+1 for Overview, Alt+2 for VPS tab
 
 ### Changelog
 
@@ -36,6 +37,7 @@ committed to git).
 - **iter-64** — Loading skeleton toolbar: added skeleton placeholders for the Updated/response-time/Refresh toolbar row to eliminate layout shift on initial data load.
 - **iter-65** — TLS expiry dates: each certificate card now shows the formatted expiry date (e.g. "Expires Sep 15, 2026") below the domain name, and issuer info is available via hover tooltip.
 - **iter-66** — Smarter time formatting: the "Updated" toolbar label now shows minutes, hours, or days instead of raw seconds.
+- **iter-67** — Keyboard shortcuts: Alt+1 switches to Overview, Alt+2 switches to VPS tab, enabling fast keyboard-driven navigation without using the sidebar.
 
 ### How the GCP credential is handled
 

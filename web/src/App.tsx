@@ -99,6 +99,17 @@ function App() {
     api.version().then(setVersion).catch(() => setVersion(null))
   }, [])
 
+  // Keyboard shortcuts: Alt+1 → Overview, Alt+2 → VPS
+  useEffect(() => {
+    function handleShortcut(e: KeyboardEvent) {
+      if (!e.altKey) return
+      if (e.key === '1') { setSection('overview'); setSidebarOpen(false) }
+      if (e.key === '2') { setSection('oracle'); setSidebarOpen(false) }
+    }
+    window.addEventListener('keydown', handleShortcut)
+    return () => window.removeEventListener('keydown', handleShortcut)
+  }, [])
+
   // Close sidebar on Escape key
   useEffect(() => {
     if (!sidebarOpen) return
