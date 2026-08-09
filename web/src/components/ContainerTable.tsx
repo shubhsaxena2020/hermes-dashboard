@@ -63,6 +63,9 @@ function parseMemPercent(mem?: string): number | null {
   return (used / total) * 100
 }
 
+// Resource-usage thresholds mirror progressIndicatorClass in color-threshold.ts
+// (80% destructive, 60% warning) so both progress bars and badges use the same
+// severity scale. Keep these in sync if either function's breakpoints change.
 function resourceBadgeVariant(pct: number | null): BadgeVariant | null {
   if (pct == null) return null
   if (pct >= 80) return 'destructive'

@@ -101,8 +101,22 @@ export function OverviewSection({ data }: { data: StatusResponse }) {
         </Card>
 
         <Card className="sm:col-span-2">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <CardTitle className="text-base">TLS certificates</CardTitle>
+            {(() => {
+              const certs = data.tls || []
+              const errored = certs.filter((c) => c.error).length
+              const expiringSoon = certs.filter((c) => !c.error && (c.daysRemaining ?? Infinity) < 30).length
+              const healthy = certs.length - errored - expiringSoon
+              if (certs.length === 0) return null
+              const label = errored > 0
+                ? `${errored} error${errored > 1 ? 's' : ''}`
+                : expiringSoon > 0
+                  ? `${healthy} OK · ${expiringSoon} expiring`
+                  : `${healthy}/${certs.length} OK`
+              const variant = errored > 0 ? 'destructive' : expiringSoon > 0 ? 'secondary' : 'outline'
+              return <Badge variant={variant}>{label}</Badge>
+            })()}
           </CardHeader>
           <CardContent>
             <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
