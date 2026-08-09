@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react'
+import { ArrowDown, ArrowUp } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,6 +17,14 @@ import {
 } from '@/components/ui/alert-dialog'
 import type { BadgeVariant, ContainerInfo } from '@/lib/api'
 import { progressIndicatorClass } from '@/lib/color-threshold'
+
+type SortKey = 'name' | 'status' | 'cpu' | 'mem'
+const SORT_OPTIONS: { key: SortKey; label: string; defaultAsc: boolean }[] = [
+  { key: 'name', label: 'Name', defaultAsc: true },
+  { key: 'status', label: 'Status', defaultAsc: true },
+  { key: 'cpu', label: 'CPU', defaultAsc: false },
+  { key: 'mem', label: 'MEM', defaultAsc: false },
+]
 
 interface Props {
   containers: ContainerInfo[]
@@ -66,6 +75,36 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
   const [pending, setPending] = useState<Record<string, boolean>>({})
   const [confirmTarget, setConfirmTarget] = useState<{ name: string; action: 'stop' | 'restart' } | null>(null)
   const [logFilter, setLogFilter] = useState<Record<string, string>>({})
+  const [sortKey, setSortKey] = useState<SortKey>('name')
+  const [sortAsc, setSortAsc] = useState(true)
+
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortAsc((a) => !a)
+    } else {
+      setSortKey(key)
+      setSortAsc(SORT_OPTIONS.find((o) => o.key === key)?.defaultAsc ?? true)
+    }
+  }
+
+  const sorted = [...containers].sort((a, b) => {
+    let cmp = 0
+    switch (sortKey) {
+      case 'name':
+        cmp = a.name.localeCompare(b.name)
+        break
+      case 'status':
+        cmp = (a.up ? 0 : 1) - (b.up ? 0 : 1)
+        break
+      case 'cpu':
+        cmp = (parseCpuPercent(b.cpu) ?? 0) - (parseCpuPercent(a.cpu) ?? 0)
+        break
+      case 'mem':
+        cmp = (parseMemPercent(b.mem) ?? 0) - (parseMemPercent(a.mem) ?? 0)
+        break
+    }
+    return sortAsc ? cmp : -cmp
+  })
 
   async function runAction(name: string, action: 'start' | 'stop' | 'restart') {
     setPending((p) => ({ ...p, [name]: true }))
@@ -99,6 +138,26 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
 
   return (
     <>
+      <div className="flex items-center gap-1.5 mb-3">
+        <span className="text-xs text-muted-foreground mr-1">Sort:</span>
+        {SORT_OPTIONS.map((opt) => (
+          <Button
+            key={opt.key}
+            type="button"
+            size="sm"
+            variant={sortKey === opt.key ? 'secondary' : 'ghost'}
+            className="h-6 px-2 text-xs"
+            onClick={() => toggleSort(opt.key)}
+          >
+            {opt.label}
+            {sortKey === opt.key && (
+              sortAsc
+                ? <ArrowUp className="size-3 ml-1" aria-hidden="true" />
+                : <ArrowDown className="size-3 ml-1" aria-hidden="true" />
+            )}
+          </Button>
+        ))}
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -108,7 +167,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
           </TableRow>
         </TableHeader>
         <TableBody>
-          {containers.map((c) => {
+          {sorted.map((c) => {
             const canControl = controllable.includes(c.name)
             const canView = !viewable || viewable.includes(c.name)
             const isPending = pending[c.name]
