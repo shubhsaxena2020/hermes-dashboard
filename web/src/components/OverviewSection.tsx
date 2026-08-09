@@ -1,12 +1,43 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { BadgeVariant, StatusResponse } from '@/lib/api'
+import { Progress } from '@/components/ui/progress'
+import type { BadgeVariant, HardwareUsage, StatusResponse } from '@/lib/api'
 
 function certBadgeVariant(daysRemaining?: number): BadgeVariant {
   if (daysRemaining == null) return 'destructive'
   if (daysRemaining < 14) return 'destructive'
   if (daysRemaining < 30) return 'secondary'
   return 'outline'
+}
+
+function healthIndicatorClass(pct: number): string {
+  if (pct >= 80) return 'bg-destructive'
+  if (pct >= 60) return 'bg-yellow-500'
+  return ''
+}
+
+function HealthRow({ label, pct, detail }: { label: string; pct: number; detail: string }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-xs">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="tabular-nums">{detail}</span>
+      </div>
+      <Progress value={pct} indicatorClassName={healthIndicatorClass(pct)} />
+    </div>
+  )
+}
+
+function SystemHealth({ usage }: { usage: HardwareUsage | null }) {
+  if (!usage) return <p className="text-sm text-muted-foreground">Usage unavailable.</p>
+  const memPct = usage.memTotalMb ? Math.round(((usage.memUsedMb ?? 0) / usage.memTotalMb) * 100) : 0
+  const diskPct = usage.diskPct ? Number(usage.diskPct.replace('%', '')) : 0
+  return (
+    <div className="space-y-3">
+      <HealthRow label="Memory" pct={memPct} detail={`${usage.memUsedMb ?? '?'} / ${usage.memTotalMb ?? '?'} MB`} />
+      <HealthRow label="Disk" pct={diskPct} detail={`${usage.diskUsed ?? '?'} / ${usage.diskTotal ?? '?'}`} />
+    </div>
+  )
 }
 
 export function OverviewSection({ data }: { data: StatusResponse }) {
@@ -26,6 +57,15 @@ export function OverviewSection({ data }: { data: StatusResponse }) {
             <p className="text-sm text-muted-foreground">
               {oracleUp}/{oracleTotal} containers up
             </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">System health</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <SystemHealth usage={data.oracle.usage} />
           </CardContent>
         </Card>
 
