@@ -1,19 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { RefreshCw, Sun, Moon } from 'lucide-react'
+import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { useStatus } from '@/hooks/useStatus'
 import { OverviewSection } from '@/components/OverviewSection'
 import { OracleSection } from '@/components/OracleSection'
+import { Sidebar, type SectionKey } from '@/components/Sidebar'
 import { api } from '@/lib/api'
-
-const NAV_ITEMS = [
-  { key: 'overview', label: 'Overview' },
-  { key: 'oracle', label: 'VPS' },
-] as const
-
-type SectionKey = (typeof NAV_ITEMS)[number]['key']
 
 function timeAgo(ts: number | null) {
   if (!ts) return ''
@@ -42,35 +35,13 @@ function App() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <nav className="w-48 shrink-0 border-r bg-card py-5 sticky top-0 h-screen flex flex-col">
-        <h1 className="px-5 text-sm font-semibold mb-5">VPS Control</h1>
-        {NAV_ITEMS.map((item) => (
-          <button
-            key={item.key}
-            onClick={() => setSection(item.key)}
-            className={cn(
-              'px-5 py-2 text-sm cursor-pointer border-l-2 border-transparent text-left text-muted-foreground hover:bg-accent',
-              section === item.key && 'border-primary text-foreground bg-accent',
-            )}
-            aria-current={section === item.key ? 'page' : undefined}
-          >
-            {item.label}
-          </button>
-        ))}
-        <button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="px-5 py-2 text-sm cursor-pointer text-muted-foreground hover:bg-accent flex items-center gap-2 mt-auto"
-          aria-label="Toggle dark mode"
-        >
-          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-        </button>
-        {version?.commit && (
-          <div className="px-5 text-xs text-muted-foreground" title={version.date || undefined}>
-            {version.commit}
-          </div>
-        )}
-      </nav>
+      <Sidebar
+        section={section}
+        onSectionChange={setSection}
+        theme={theme}
+        onThemeToggle={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        version={version}
+      />
 
       <main className="flex-1 p-8 max-w-5xl">
         {!data ? (
