@@ -8,6 +8,7 @@ import { formatUptime } from '@/lib/time'
 import { ExternalLink } from 'lucide-react'
 
 import { certBadgeVariant } from '@/lib/badge-utils'
+import type { SectionKey } from '@/components/Sidebar'
 
 function HealthRow({ label, pct, detail }: { label: string; pct: number; detail: string }) {
   return (
@@ -37,7 +38,7 @@ function SystemHealth({ usage }: { usage: HardwareUsage | null }) {
   )
 }
 
-export function OverviewSection({ data }: { data: StatusResponse }) {
+export function OverviewSection({ data, onNavigate }: { data: StatusResponse; onNavigate?: (section: SectionKey) => void }) {
   const oracleUp = data.oracle.containers.filter((c) => c.up).length
   const oracleTotal = data.oracle.containers.length
   const downContainers = data.oracle.containers.filter((c) => !c.up).map((c) => c.name)
@@ -68,6 +69,16 @@ export function OverviewSection({ data }: { data: StatusResponse }) {
               <p className="text-xs text-muted-foreground">
                 Uptime: {formatUptime(data.oracle.usage.uptimeSeconds)}
               </p>
+            )}
+            {onNavigate && downContainers.length > 0 && (
+              <button
+                type="button"
+                onClick={() => onNavigate('oracle')}
+                className="text-xs text-primary hover:underline mt-1"
+                aria-label="View VPS container details"
+              >
+                View details →
+              </button>
             )}
           </CardContent>
         </Card>

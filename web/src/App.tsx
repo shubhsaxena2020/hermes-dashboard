@@ -236,7 +236,7 @@ function App() {
               </div>
             )}
             <ErrorBoundary key={section} sectionLabel={section === 'overview' ? 'Overview' : 'VPS'}>
-              {section === 'overview' && <OverviewSection data={data} />}
+              {section === 'overview' && <OverviewSection data={data} onNavigate={setSection} />}
               {section === 'oracle' && <OracleSection oracle={data.oracle} refresh={refresh} />}
             </ErrorBoundary>
           </>

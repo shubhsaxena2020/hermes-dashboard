@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { ArrowDown, ArrowUp, Loader2, RefreshCw } from 'lucide-react'
+import { ArrowDown, ArrowUp, Check, Copy, Loader2, RefreshCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -73,6 +73,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
   const [sortAsc, setSortAsc] = useState(true)
   const [nameFilter, setNameFilter] = useState('')
   const [autoRefresh, setAutoRefresh] = useState<Record<string, boolean>>({})
+  const [copiedLogs, setCopiedLogs] = useState<Record<string, boolean>>({})
 
   // Stable ref so the auto-refresh useEffect doesn't re-run when the parent
   // passes a new inline callback on every render (App → OracleSection → here).
@@ -164,6 +165,16 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
       setOpenLogs((o) => ({ ...o, [name]: logs }))
     } catch (err) {
       setOpenLogs((o) => ({ ...o, [name]: [`Failed to load logs: ${(err as Error).message}`] }))
+    }
+  }
+
+  async function copyLogs(name: string, lines: string[]) {
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'))
+      setCopiedLogs((c) => ({ ...c, [name]: true }))
+      setTimeout(() => setCopiedLogs((c) => ({ ...c, [name]: false })), 2000)
+    } catch {
+      // Clipboard API may not be available in all contexts
     }
   }
 
@@ -361,6 +372,22 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                               <RefreshCw className={`size-3 ${autoRefresh[c.name] ? 'animate-spin' : ''}`} aria-hidden="true" />
                               {autoRefresh[c.name] ? 'Live' : 'Auto'}
                             </Button>
+                            {Array.isArray(filteredLines) && (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                className="h-7 px-2 text-xs gap-1"
+                                aria-label={copiedLogs[c.name] ? 'Copied log lines to clipboard' : 'Copy log lines to clipboard'}
+                                onClick={() => copyLogs(c.name, filteredLines as string[])}
+                                disabled={copiedLogs[c.name]}
+                              >
+                                {copiedLogs[c.name]
+                                  ? <Check className="size-3" aria-hidden="true" />
+                                  : <Copy className="size-3" aria-hidden="true" />}
+                                {copiedLogs[c.name] ? 'Copied!' : 'Copy'}
+                              </Button>
+                            )}
                             {Array.isArray(logState) && (
                               <span className="text-xs text-muted-foreground">
                                 {filter
