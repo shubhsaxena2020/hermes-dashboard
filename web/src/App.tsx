@@ -22,7 +22,7 @@ function timeAgo(ts: number | null) {
 
 function App() {
   const [section, setSection] = useState<SectionKey>('overview')
-  const { data, lastUpdated, refresh } = useStatus()
+  const { data, lastUpdated, error, refresh } = useStatus()
   const [, forceTick] = useState(0)
   const [version, setVersion] = useState<{ commit: string | null; date: string | null } | null>(null)
   const { theme, setTheme } = useTheme()
@@ -77,6 +77,11 @@ function App() {
           <>
             <div className="flex justify-end mb-2">
               <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
+              {error && (
+                <span className="ml-3 text-xs text-destructive" title={error}>
+                  ⚠ Stale — poll failed
+                </span>
+              )}
             </div>
             {section === 'overview' && <OverviewSection data={data} />}
             {section === 'oracle' && <OracleSection oracle={data.oracle} refresh={refresh} />}
