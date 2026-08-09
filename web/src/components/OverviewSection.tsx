@@ -106,7 +106,12 @@ export function OverviewSection({ data }: { data: StatusResponse }) {
           </CardHeader>
           <CardContent>
             <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-              {(data.tls || []).map((cert) => {
+              {[...(data.tls || [])].sort((a, b) => {
+                // Error certs first, then by fewest days remaining
+                if (a.error && !b.error) return -1
+                if (!a.error && b.error) return 1
+                return (a.daysRemaining ?? Infinity) - (b.daysRemaining ?? Infinity)
+              }).map((cert) => {
                 const expiryDate = cert.validTo ? new Date(cert.validTo) : null
                 const expiryLabel = expiryDate
                   ? expiryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
