@@ -69,8 +69,8 @@ export const Sidebar = forwardRef<HTMLButtonElement, SidebarProps>(
           {theme === 'dark' ? 'Light mode' : 'Dark mode'}
         </button>
         {version?.commit && (
-          <div className="px-5 text-xs text-muted-foreground" title={version.date || undefined}>
-            {version.commit}
+          <div className="px-5 text-xs text-muted-foreground" title={version.commit || undefined}>
+            {version.commit?.slice(0, 7)}
           </div>
         )}
       </nav>
