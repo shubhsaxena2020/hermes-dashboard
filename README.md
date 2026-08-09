@@ -17,6 +17,13 @@ committed to git).
 - **Dark mode**: toggle in the sidebar; defaults to system preference
 - **Auto-polling**: status refreshes every 5 seconds; manual refresh and error indicator in the toolbar
 
+### Changelog
+
+- **iter-50** — Dark mode toggle: added ThemeProvider (next-themes) in main.tsx, Sun/Moon toggle button in sidebar (App.tsx).
+- **iter-51** — Error state tracking: useStatus hook now surfaces poll errors; "Stale — poll failed" indicator added to toolbar; manual Refresh button with aria-label added.
+- **iter-52** — UI polish: upgraded Refresh to shadcn Button with RefreshCw icon; normalized all action buttons to size="default" (sm→default); added aria-current on nav items; added flex-wrap on toolbar; added Features section to README.
+- **iter-53** — Architecture: extracted sidebar navigation into dedicated Sidebar.tsx component, reducing App.tsx from 107 to 78 lines.
+
 ### How the GCP credential is handled
 
 This project blocks service-account key creation at the org level, so the
