@@ -66,7 +66,7 @@ function parseMemPercent(mem?: string): number | null {
 function resourceBadgeVariant(pct: number | null): BadgeVariant | null {
   if (pct == null) return null
   if (pct >= 80) return 'destructive'
-  if (pct >= 50) return 'secondary'
+  if (pct >= 60) return 'secondary'
   return null
 }
 
