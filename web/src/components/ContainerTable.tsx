@@ -182,8 +182,8 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
           <TableRow>
             <TableHead>Container</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">CPU</TableHead>
-            <TableHead className="text-right">MEM</TableHead>
+            <TableHead className="text-right hidden sm:table-cell">CPU</TableHead>
+            <TableHead className="text-right hidden sm:table-cell">MEM</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -223,7 +223,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                       <span className={c.up ? 'text-green-500' : 'text-red-500'}>{c.status}</span>
                     </span>
                   </TableCell>
-                  <TableCell className="text-right tabular-nums text-sm">
+                  <TableCell className="text-right tabular-nums text-sm hidden sm:table-cell">
                     {cpuPct != null ? (
                       <div className="flex items-center justify-end gap-2">
                         <span>{cpuPct}%</span>
@@ -238,7 +238,7 @@ export function ContainerTable({ containers, controllable, viewable, onAction, o
                       <span className="text-muted-foreground">{c.cpu || '—'}</span>
                     )}
                   </TableCell>
-                  <TableCell className="text-right tabular-nums text-sm">
+                  <TableCell className="text-right tabular-nums text-sm hidden sm:table-cell">
                     {memPct != null ? (
                       <div className="flex items-center justify-end gap-2">
                         <span>{memPct}%</span>
