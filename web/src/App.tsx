@@ -158,13 +158,17 @@ function App() {
         />
       )}
 
-      {/* Hamburger button — mobile only */}
+      {/* Hamburger button — mobile only. Hidden from AT and tab order when
+          the sidebar is open so keyboard users don't land on a duplicate
+          toggle; the close button inside the sidebar handles dismissal. */}
       <button
         ref={hamburgerRef}
         type="button"
         onClick={() => setSidebarOpen((o) => !o)}
         className="fixed top-4 left-4 z-[60] p-2 rounded-md bg-card border shadow-md md:hidden"
         aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
+        aria-hidden={sidebarOpen || undefined}
+        tabIndex={sidebarOpen ? -1 : 0}
       >
         {sidebarOpen ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
       </button>
