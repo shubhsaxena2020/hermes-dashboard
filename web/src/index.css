@@ -88,13 +88,14 @@
     --brand: #00a8d8;
     --brand-foreground: #ffffff;
 
-    /* Sidebar — always dark slate. */
-    --sidebar: #1f2d3a;
+    /* Sidebar — always dark slate, tuned to the Plesk Obsidian reference
+       (reference sidebar measured ~#31475a). */
+    --sidebar: #2b3b4c;
     --sidebar-foreground: #c7d2dc;
-    --sidebar-muted: #8a99a8;
-    --sidebar-accent: #2a3b4d;
-    --sidebar-active: #324b5e;
-    --sidebar-border: #2a3b4d;
+    --sidebar-muted: #93a4b3;
+    --sidebar-accent: #34495c;
+    --sidebar-active: #3a5167;
+    --sidebar-border: #34495c;
     --sidebar-ring: #00a8d8;
 }
 
