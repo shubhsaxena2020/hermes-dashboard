@@ -5,7 +5,11 @@
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "build": "npm --prefix web run build",
+    "test": "npm --prefix web run test",
+    "lint": "npm --prefix web run lint",
+    "verify": "bash web/scripts/verify.sh"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
