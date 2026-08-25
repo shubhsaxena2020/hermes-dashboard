@@ -35,6 +35,23 @@ export interface CostEstimate {
   note?: string
 }
 
+export interface TrafficUsage {
+  /** Bytes used this period, or null when the host reports no figure. */
+  usedBytes?: number | null
+  /** Bytes limit for the period, or null for "Unlimited". */
+  limitBytes?: number | null
+  /** Human label for when the counter resets (e.g. "Resets Sep 1"). */
+  resetLabel?: string | null
+}
+
+export interface SubscriptionInfo {
+  planName?: string | null
+  renewalDate?: string | null
+  systemIp?: string | null
+  phpVersion?: string | null
+  osLabel?: string | null
+}
+
 export interface StatusResponse {
   oracle: {
     containers: ContainerInfo[]
@@ -44,6 +61,10 @@ export interface StatusResponse {
   }
   tls: TlsCertStatus[]
   costs: { main: CostEstimate }
+  /** Optional — present only when the host reports bandwidth stats. */
+  traffic?: TrafficUsage | null
+  /** Optional — subscription/plan summary for the right rail. */
+  subscription?: SubscriptionInfo | null
 }
 
 async function req<T>(url: string, opts?: RequestInit): Promise<T> {
@@ -55,8 +76,16 @@ async function req<T>(url: string, opts?: RequestInit): Promise<T> {
   return body as T
 }
 
+// When VITE_MOCK=1 we serve a deterministic dataset so the UI can be rendered
+// and visually verified without a live backend. Keep the import dynamic-free
+// so tree-shaking drops it from production builds (VITE_MOCK is undefined there).
+const USE_MOCK = import.meta.env.VITE_MOCK === '1'
+
 export const api = {
-  status: () => req<StatusResponse>('/api/status'),
+  status: () =>
+    USE_MOCK
+      ? import('@/lib/mock-data').then((m) => m.mockStatus as StatusResponse)
+      : req<StatusResponse>('/api/status'),
 
   oracleContainerAction: (name: string, action: string) =>
     req<{ ok: true }>(`/api/oracle/containers/${name}/${action}`, { method: 'POST' }),

@@ -1,85 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { RefreshCw, Menu, X, WifiOff } from 'lucide-react'
+import { RefreshCw, Menu, X, WifiOff, Bell, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useStatus } from '@/hooks/useStatus'
-import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { OverviewSection } from '@/components/OverviewSection'
-import { OracleSection } from '@/components/OracleSection'
-import { Sidebar, type SectionKey } from '@/components/Sidebar'
+import { SectionRenderer } from '@/components/SectionRenderer'
+import { RightRail } from '@/components/RightRail'
+import { Sidebar } from '@/components/Sidebar'
 import { api } from '@/lib/api'
 import { timeAgo } from '@/lib/time'
 import { responseTimeClass } from '@/lib/color-threshold'
+import { NAV_BY_KEY, type SectionKey } from '@/lib/nav'
 
 function LoadingSkeleton() {
   return (
-    <div className="space-y-6" role="status" aria-label="Loading dashboard">
-      <div className="flex items-center justify-end mb-2 gap-2 flex-wrap">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-4 w-12" />
-        <Skeleton className="h-8 w-16 rounded-md" />
-      </div>
-      <Skeleton className="h-7 w-24" />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <Skeleton className="h-5 w-16" />
-            <Skeleton className="h-5 w-16 rounded-full" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-4 w-32" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-5 w-24" />
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Skeleton className="h-3 w-full" />
-            <Skeleton className="h-3 w-3/4" />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-5 w-24" />
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            <Skeleton className="h-7 w-20 rounded-lg" />
-            <Skeleton className="h-7 w-16 rounded-lg" />
-          </CardContent>
-        </Card>
-        <Card className="sm:col-span-2">
-          <CardHeader>
-            <Skeleton className="h-5 w-32" />
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between gap-2 rounded-md border px-3 py-2">
-                  <Skeleton className="h-4 w-16" />
-                  <Skeleton className="h-5 w-8 rounded-full" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="sm:col-span-2">
-          <CardHeader>
-            <Skeleton className="h-5 w-32" />
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-4 w-48" />
-          </CardContent>
-        </Card>
-      </div>
+    <div className="space-y-5" role="status" aria-label="Loading dashboard">
+      <Skeleton className="h-7 w-40" />
+      <Skeleton className="h-20 w-full rounded-lg" />
+      <Skeleton className="h-40 w-full rounded-lg" />
+      <Skeleton className="h-48 w-full rounded-lg" />
     </div>
   )
 }
 
 function App() {
-  const [section, setSection] = useState<SectionKey>('overview')
+  const [section, setSection] = useState<SectionKey>('domains')
   const { data, lastUpdated, error, responseMs, refresh } = useStatus()
   const [, forceTick] = useState(0)
   const [version, setVersion] = useState<{ commit: string | null; date: string | null } | null>(null)
@@ -88,14 +34,13 @@ function App() {
   const hamburgerRef = useRef<HTMLButtonElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
-  // re-render every second so the "updated Xs ago" note stays live,
-  // but pause while the tab is hidden to save CPU cycles.
+  // Re-render every second so the "updated Xs ago" note stays live; pause when
+  // the tab is hidden to save CPU.
   useEffect(() => {
     let id: number | null = null
     function start() { id = window.setInterval(() => forceTick((n) => n + 1), 1000) }
     function stop() { if (id != null) { window.clearInterval(id); id = null } }
     function onVisibility() { if (document.hidden) stop(); else start() }
-
     start()
     document.addEventListener('visibilitychange', onVisibility)
     return () => {
@@ -104,53 +49,46 @@ function App() {
     }
   }, [])
 
-  // Version never changes during a running session -- fetch once, not on
-  // every 5s status poll.
+  // Version never changes during a session — fetch once.
   useEffect(() => {
     api.version().then(setVersion).catch(() => setVersion(null))
   }, [])
 
-  // Keyboard shortcuts: Alt+1 → Overview, Alt+2 → VPS
+  // Keyboard shortcuts: Alt+1 → Domains, Alt+2 → Server
   useEffect(() => {
     function handleShortcut(e: KeyboardEvent) {
       if (!e.altKey) return
-      if (e.key === '1') { setSection('overview'); setSidebarOpen(false) }
-      if (e.key === '2') { setSection('oracle'); setSidebarOpen(false) }
+      if (e.key === '1') { setSection('domains'); setSidebarOpen(false) }
+      if (e.key === '2') { setSection('server'); setSidebarOpen(false) }
     }
     window.addEventListener('keydown', handleShortcut)
     return () => window.removeEventListener('keydown', handleShortcut)
   }, [])
 
-  // Close sidebar on Escape key
+  // Close sidebar on Escape.
   useEffect(() => {
     if (!sidebarOpen) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setSidebarOpen(false)
-    }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSidebarOpen(false) }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [sidebarOpen])
 
-  // Update document title with section name and connection state so the
-  // browser tab bar is useful when multiple tabs are open.
+  // Tab-title reflects the active section + connection health.
   useEffect(() => {
-    const sectionLabel = section === 'overview' ? 'Overview' : 'VPS'
-    const suffix = error ? ' ⚠' : ''
-    document.title = `${sectionLabel}${suffix} — VPS Control`
+    const label = NAV_BY_KEY[section]?.label ?? 'Hosting'
+    document.title = `${label}${error ? ' ⚠' : ''} — Hosting Panel`
   }, [section, error])
 
-  // Focus management: focus close button when sidebar opens, restore to hamburger when it closes
+  // Focus management for the mobile sidebar.
   useEffect(() => {
-    if (sidebarOpen) {
-      closeButtonRef.current?.focus()
-    } else {
-      hamburgerRef.current?.focus()
-    }
+    if (sidebarOpen) closeButtonRef.current?.focus()
+    else hamburgerRef.current?.focus()
   }, [sidebarOpen])
+
+  const sectionLabel = NAV_BY_KEY[section]?.label ?? 'Hosting'
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      {/* Mobile backdrop */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 md:hidden"
@@ -159,14 +97,11 @@ function App() {
         />
       )}
 
-      {/* Hamburger button — mobile only. Hidden from AT and tab order when
-          the sidebar is open so keyboard users don't land on a duplicate
-          toggle; the close button inside the sidebar handles dismissal. */}
       <button
         ref={hamburgerRef}
         type="button"
         onClick={() => setSidebarOpen((o) => !o)}
-        className="fixed top-4 left-4 z-[60] p-2 rounded-md bg-card border shadow-md md:hidden"
+        className="fixed top-3 left-3 z-[60] flex size-9 items-center justify-center rounded-md bg-sidebar text-sidebar-foreground shadow-md md:hidden"
         aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
         aria-hidden={sidebarOpen || undefined}
         tabIndex={sidebarOpen ? -1 : 0}
@@ -186,67 +121,95 @@ function App() {
         ref={closeButtonRef}
       />
 
-      <main
-        id="main-content"
-        className="flex-1 p-4 md:p-8 max-w-5xl"
-        inert={sidebarOpen || undefined}
-      >
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded"
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* Topbar */}
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card px-4 md:px-6">
+          <div className="hidden md:block text-sm font-medium text-muted-foreground">
+            {sectionLabel}
+          </div>
+          <div className="relative ml-auto hidden sm:block w-56">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+            <Input
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              className="h-9 pl-8 rounded-full bg-muted/60 border-transparent focus-visible:bg-background"
+            />
+          </div>
+          <span
+            className={`size-2.5 rounded-full ${error ? 'bg-destructive' : 'bg-chart-2'}`}
+            role="img"
+            aria-label={error ? 'Disconnected' : 'Connected'}
+            title={error ? `Disconnected: ${error}` : 'Backend reachable'}
+          />
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            className="text-muted-foreground"
+            aria-label="Notifications"
+          >
+            <Bell className="size-4" aria-hidden="true" />
+          </Button>
+        </header>
+
+        <main
+          id="main-content"
+          className="flex-1 px-4 py-5 md:px-6 md:py-6"
+          inert={sidebarOpen || undefined}
         >
-          Skip to main content
-        </a>
-        {!data ? (
-          <LoadingSkeleton />
-        ) : (
-          <>
-            <div className="flex items-center justify-end mb-2 gap-2 flex-wrap">
-              <span
-                className={`w-2 h-2 rounded-full inline-block ${error ? 'bg-red-500' : 'bg-green-500'}`}
-                role="img"
-                aria-label={error ? 'Disconnected' : 'Connected'}
-                title={error ? `Disconnected: ${error}` : 'Backend reachable'}
-              />
-              <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
-              {responseMs != null && (
-                <span className={`text-xs font-medium tabular-nums ${responseTimeClass(responseMs)}`} title={`API response time: ${responseMs}ms`}>
-                  {responseMs}ms
-                </span>
-              )}
-              <Button
-                type="button"
-                size="default"
-                variant="ghost"
-                onClick={refresh}
-                className="text-muted-foreground"
-                aria-label="Refresh status"
-              >
-                <RefreshCw className="size-3" aria-hidden="true" />
-                Refresh
-              </Button>
-              {error && (
-                <span className="text-xs text-destructive" title={error}>
-                  ⚠ Stale — poll failed
-                </span>
-              )}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded"
+          >
+            Skip to main content
+          </a>
+
+          {error && (
+            <div
+              className="mb-4 flex items-center gap-2 rounded-md border border-chart-4/50 bg-chart-4/10 px-4 py-3 text-sm text-chart-4 dark:text-chart-4"
+              role="alert"
+            >
+              <WifiOff className="size-4 shrink-0" aria-hidden="true" />
+              <span>Connection lost — showing stale data. Will retry automatically.</span>
             </div>
-            {error && (
-              <div
-                className="mb-4 rounded-md border border-amber-500/50 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-400 flex items-center gap-2"
-                role="alert"
-              >
-                <WifiOff className="size-4 shrink-0" aria-hidden="true" />
-                <span>Connection lost — showing stale data. Will retry automatically.</span>
+          )}
+
+          {!data ? (
+            <LoadingSkeleton />
+          ) : (
+            <div className="mx-auto flex max-w-[1400px] flex-col gap-6 lg:flex-row lg:items-start">
+              <div className="min-w-0 flex-1">
+                <div className="mb-4 flex items-center justify-end gap-2 flex-wrap">
+                  <span className="text-xs text-muted-foreground">Updated {timeAgo(lastUpdated)}</span>
+                  {responseMs != null && (
+                    <span
+                      className={`text-xs font-medium tabular-nums ${responseTimeClass(responseMs)}`}
+                      title={`API response time: ${responseMs}ms`}
+                    >
+                      {responseMs}ms
+                    </span>
+                  )}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={refresh}
+                    className="text-muted-foreground"
+                    aria-label="Refresh status"
+                  >
+                    <RefreshCw className="size-3.5" aria-hidden="true" />
+                    Refresh
+                  </Button>
+                </div>
+                <SectionRenderer section={section} data={data} onNavigate={setSection} />
               </div>
-            )}
-            <ErrorBoundary key={section} sectionLabel={section === 'overview' ? 'Overview' : 'VPS'}>
-              {section === 'overview' && <OverviewSection data={data} onNavigate={setSection} />}
-              {section === 'oracle' && <OracleSection oracle={data.oracle} refresh={refresh} />}
-            </ErrorBoundary>
-          </>
-        )}
-      </main>
+
+              <RightRail data={data} />
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }

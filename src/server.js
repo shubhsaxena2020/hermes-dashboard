@@ -9,6 +9,7 @@ const oracleHardware = require('./oracle-hardware')
 const firecrawlRelay = require('./firecrawl-relay')
 const tlsStatus = require('./tls-status')
 const costEstimate = require('./cost-estimate')
+const traffic = require('./traffic')
 const { getVersion } = require('./version')
 
 // Merge a {cpu, mem} stats map onto a container list in place -- shared by
@@ -44,12 +45,13 @@ app.use(express.json())
 
 app.get('/api/status', async (req, res) => {
   try {
-    const [oracleContainersRaw, oracleStats, oracleUsage, tls, ownMachineType] = await Promise.all([
+    const [oracleContainersRaw, oracleStats, oracleUsage, tls, ownMachineType, trafficBytes] = await Promise.all([
       oracleStatus.getOracleContainerHealth().catch((err) => ({ error: err.message })),
       oracleStatus.getOracleContainerStats().catch(() => ({})),
       oracleHardware.getHardwareUsage().catch(() => null),
       tlsStatus.getTlsStatus().catch(() => []),
       costEstimate.getOwnMachineType().catch(() => null),
+      traffic.getNetTrafficBytes().catch(() => null),
     ])
 
     const oracleContainers = Array.isArray(oracleContainersRaw)
@@ -70,6 +72,22 @@ app.get('/api/status', async (req, res) => {
           monthlyEstimate: costEstimate.monthlyEstimate(ownMachineType),
           alwaysOn: true,
         },
+      },
+      traffic: {
+        usedBytes: trafficBytes,
+        // Limit is null => "Unlimited" in the UI. Set a number here if the host
+        // has a bandwidth cap (e.g. trafficMonthlyGb * GB).
+        limitBytes: null,
+        resetLabel: 'Resets on the 1st',
+      },
+      // Plan/subscription summary for the right rail. Static-ish today; swap
+      // for a config source when billing data becomes available.
+      subscription: {
+        planName: 'Web Host Pro',
+        renewalDate: '2026-09-01',
+        systemIp: process.env.SYSTEM_IP || null,
+        phpVersion: '8.3',
+        osLabel: 'Ubuntu 22.04 LTS',
       },
     }
 
