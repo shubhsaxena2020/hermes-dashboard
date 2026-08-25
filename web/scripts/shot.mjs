@@ -47,6 +47,22 @@ await page.waitForTimeout(1200)
 await page.screenshot({ path: '/home/ubuntu/_render_domains.png' })
 console.log('console errors:', errors.length ? errors.join(' | ') : 'none')
 
+// Dark-mode capture: force the .dark class (next-themes applies .dark CSS).
+const darkPage = await browser.newPage({ viewport: { width: 1792, height: 1096 } })
+const darkErrors = []
+darkPage.on('console', (m) => { if (m.type() === 'error') darkErrors.push(m.text()) })
+await darkPage.route('**/api/status', (route) =>
+  route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync('/tmp/status.json', 'utf8') }))
+await darkPage.route('**/api/version', (route) =>
+  route.fulfill({ status: 200, contentType: 'application/json', body: '{"commit":"abc1234","date":null}' }))
+await darkPage.addInitScript(() => { try { localStorage.setItem('theme', 'dark') } catch {} })
+await darkPage.goto('http://127.0.0.1:4399/', { waitUntil: 'networkidle' })
+await darkPage.waitForSelector('nav', { timeout: 5000 })
+await darkPage.waitForTimeout(1200)
+await darkPage.screenshot({ path: '/home/ubuntu/_render_domains_dark.png' })
+console.log('dark console errors:', darkErrors.length ? darkErrors.join(' | ') : 'none')
+await darkPage.close()
+
 // Click "Server" to capture that view too (match by text, ignore badge span).
 let clicked = false
 try {

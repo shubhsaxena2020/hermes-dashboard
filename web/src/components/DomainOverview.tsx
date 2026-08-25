@@ -66,16 +66,14 @@ export function DomainOverview({
 }) {
   const certs = data.tls ?? []
   // One card per hosted domain (driven by the real TLS list from the backend).
-  const domains = certs.length
-    ? certs.map((c) => ({
-        name: c.domain,
-        expiresLabel: c.validTo
-          ? new Date(c.validTo).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: undefined } as Intl.DateTimeFormatOptions)
-          : null,
-        daysRemaining: c.daysRemaining,
-        error: !!c.error,
-      }))
-    : [{ name: 'example.com', expiresLabel: null, daysRemaining: undefined, error: false }]
+  const domains = certs.map((c) => ({
+    name: c.domain,
+    expiresLabel: c.validTo
+      ? new Date(c.validTo).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      : null,
+    daysRemaining: c.daysRemaining,
+    error: !!c.error,
+  }))
 
   const upCount = data.oracle.containers.filter((c) => c.up).length
   const total = data.oracle.containers.length
@@ -93,6 +91,22 @@ export function DomainOverview({
           {upCount}/{total} services up
         </Badge>
       </div>
+
+      {/* Empty state when no domains/certs are reported by the backend. */}
+      {domains.length === 0 && (
+        <Card>
+          <CardContent className="flex flex-col items-center gap-2 py-10 text-center">
+            <div className="size-12 rounded-full bg-brand/10 flex items-center justify-center">
+              <Globe className="size-6 text-brand" aria-hidden="true" />
+            </div>
+            <div className="text-base font-medium text-foreground">No domains yet</div>
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Add a domain or install an SSL certificate and it will appear here
+              with its hosting quick-actions.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* A per-domain card, each with its own quick-action row (Plesk-style). */}
       {domains.map((d) => (
