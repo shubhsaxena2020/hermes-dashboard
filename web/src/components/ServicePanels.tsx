@@ -342,6 +342,63 @@ export function SslPanel() {
   )
 }
 
+export function SecurityPanel({ data }: { data: StatusResponse }) {
+  const certs = data.tls ?? []
+  const expired = certs.filter((c) => c.error || (c.daysRemaining != null && c.daysRemaining < 0))
+  const expiring = certs.filter((c) => !c.error && c.daysRemaining != null && c.daysRemaining >= 0 && c.daysRemaining < 14)
+  const healthy = certs.filter((c) => !c.error && c.daysRemaining != null && c.daysRemaining >= 14)
+
+  const rows: { label: string; detail: string; tone: 'ok' | 'warn' | 'bad' }[] = [
+    {
+      label: 'Valid certificates',
+      detail: healthy.length ? `${healthy.length} certificate${healthy.length !== 1 ? 's' : ''} valid for 14+ days` : 'None',
+      tone: healthy.length ? 'ok' : 'warn',
+    },
+    {
+      label: 'Expiring soon',
+      detail: expiring.length ? `${expiring.length} certificate${expiring.length !== 1 ? 's' : ''} expiring within 14 days` : 'None',
+      tone: expiring.length ? 'warn' : 'ok',
+    },
+    {
+      label: 'Expired / error',
+      detail: expired.length ? `${expired.length} certificate${expired.length !== 1 ? 's' : ''} expired or failing` : 'None',
+      tone: expired.length ? 'bad' : 'ok',
+    },
+  ]
+
+  return (
+    <PanelShell title="Security" icon={<ShieldCheck className="size-4 text-brand" aria-hidden="true" />} onRefresh={() => {}}>
+      <ul className="space-y-2.5">
+        {rows.map((r) => (
+          <li key={r.label} className="flex items-center justify-between gap-3">
+            <span className="text-sm text-foreground">{r.label}</span>
+            <span
+              className={
+                r.tone === 'bad'
+                  ? 'text-xs font-medium text-destructive'
+                  : r.tone === 'warn'
+                    ? 'text-xs font-medium text-amber-600 dark:text-amber-400'
+                    : 'text-xs font-medium text-chart-2'
+              }
+            >
+              {r.detail}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {expired.length > 0 && (
+        <div className="mt-3 space-y-1">
+          {expired.map((c) => (
+            <div key={c.domain} className="text-xs text-muted-foreground">
+              {c.domain}: {c.error ? c.error : 'expired'}
+            </div>
+          ))}
+        </div>
+      )}
+    </PanelShell>
+  )
+}
+
 export function LogsPanel({ data }: { data: StatusResponse }) {
   const viewable = data.oracle.viewable ?? []
   const stateByName = Object.fromEntries((data.oracle.containers ?? []).map((c) => [c.name, c]))
