@@ -10,6 +10,10 @@ const firecrawlRelay = require('./firecrawl-relay')
 const tlsStatus = require('./tls-status')
 const costEstimate = require('./cost-estimate')
 const domains = require('./domains')
+const git = require('./git')
+const files = require('./files')
+const backups = require('./backups')
+const databases = require('./databases')
 const traffic = require('./traffic')
 const { getVersion } = require('./version')
 
@@ -124,6 +128,39 @@ app.get('/api/domains', async (req, res) => {
     res.status(500).json({ error: err.message })
   }
 })
+
+app.get('/api/git', async (req, res) => {
+  try {
+    res.json({ repos: await git.getGitRepos() })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get('/api/files', async (req, res) => {
+  try {
+    res.json(await files.getFiles())
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get('/api/backups', async (req, res) => {
+  try {
+    res.json(await backups.getBackups())
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+app.get('/api/databases', async (req, res) => {
+  try {
+    res.json(await databases.getDatabases())
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
 app.get('/api/version', (req, res) => {
   res.json(getVersion())
 })

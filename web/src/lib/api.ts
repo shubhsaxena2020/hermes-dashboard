@@ -64,6 +64,51 @@ export interface DomainsResponse {
   domains: DomainInfo[]
 }
 
+export interface GitRepo {
+  repo: string
+  path: string
+  branch: string
+  remote: string | null
+  dirty: number
+}
+
+export interface GitResponse {
+  repos: GitRepo[]
+}
+
+export interface FileEntry {
+  name: string
+  size: string
+  path: string
+}
+
+export interface FilesResponse {
+  root: string
+  entries: FileEntry[]
+}
+
+export interface BackupEntry {
+  name: string
+  sizeBytes: number
+  modifiedAt: number
+}
+
+export interface BackupsResponse {
+  root: string
+  backups: BackupEntry[]
+}
+
+export interface DatabaseInfo {
+  name: string
+  image: string
+  up: boolean
+  status: string
+}
+
+export interface DatabasesResponse {
+  databases: DatabaseInfo[]
+}
+
 export interface SubscriptionInfo {
   planName?: string | null
   renewalDate?: string | null
@@ -117,4 +162,24 @@ export const api = {
     USE_MOCK
       ? import('@/lib/mock-data').then((m) => m.mockDomains as DomainsResponse)
       : req<DomainsResponse>('/api/domains'),
+
+  git: () =>
+    USE_MOCK
+      ? import('@/lib/mock-data').then((m) => m.mockGit as GitResponse)
+      : req<GitResponse>('/api/git'),
+
+  files: () =>
+    USE_MOCK
+      ? import('@/lib/mock-data').then((m) => m.mockFiles as FilesResponse)
+      : req<FilesResponse>('/api/files'),
+
+  backups: () =>
+    USE_MOCK
+      ? import('@/lib/mock-data').then((m) => m.mockBackups as BackupsResponse)
+      : req<BackupsResponse>('/api/backups'),
+
+  databases: () =>
+    USE_MOCK
+      ? import('@/lib/mock-data').then((m) => m.mockDatabases as DatabasesResponse)
+      : req<DatabasesResponse>('/api/databases'),
 }

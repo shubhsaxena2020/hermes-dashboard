@@ -43,6 +43,11 @@ await page.route('**/api/version', (route) =>
 await page.route('**/api/domains', (route) =>
   route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync('/tmp/domains.json', 'utf8') }),
 )
+for (const [ep, file] of [['git', '/tmp/git.json'], ['files', '/tmp/files.json'], ['backups', '/tmp/backups.json'], ['databases', '/tmp/databases.json']]) {
+  await page.route(`**/api/${ep}`, (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync(file, 'utf8') }),
+  )
+}
 
 await page.goto('http://127.0.0.1:4399/', { waitUntil: 'networkidle' })
 await page.waitForSelector('nav', { timeout: 5000 })
@@ -75,6 +80,19 @@ try {
 await page.waitForTimeout(900)
 await page.screenshot({ path: '/home/ubuntu/_render_server.png' })
 console.log('server view captured:', clicked)
+
+// Capture each wired service panel via the sidebar (real data render check).
+const PANELS = ['Databases', 'Git', 'Backup Manager', 'File Manager', 'SSL/TLS']
+for (const label of PANELS) {
+  try {
+    await page.click(`button:has-text("${label}")`, { timeout: 2000 })
+    await page.waitForTimeout(900)
+    await page.screenshot({ path: `/home/ubuntu/_render_${label.toLowerCase().replace(/[^a-z]/g, '')}.png` })
+    console.log('panel captured:', label)
+  } catch (e) {
+    console.log('panel MISSING:', label, e.message)
+  }
+}
 
 await browser.close()
 server.close()

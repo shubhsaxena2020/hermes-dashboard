@@ -1,4 +1,4 @@
-import type { StatusResponse } from '@/lib/api'
+import type { StatusResponse, GitResponse, FilesResponse, BackupsResponse, DatabasesResponse } from '@/lib/api'
 
 // Deterministic mock so the dashboard can be rendered and visually verified
 // without a live backend (used with VITE_MOCK=1). Mirrors the real
@@ -87,5 +87,38 @@ export const mockDomains: DomainsResponse = {
     { domain: 'portainer.shubhbuilds.com', service: 'portainer', reachable: true, httpStatus: 200, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-12-01T00:00:00Z', daysRemaining: 98 } },
     { domain: 'monitor.shubhbuilds.com', service: 'netdata', reachable: true, httpStatus: 200, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-11-10T00:00:00Z', daysRemaining: 77 } },
     { domain: 'firecrawl.shubhbuilds.com', service: 'firecrawl', reachable: false, httpStatus: null, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-07-02T00:00:00Z', daysRemaining: undefined, error: 'certificate expired' } },
+  ],
+}
+
+export const mockGit: GitResponse = {
+  repos: [
+    { repo: 'hermes-dashboard', path: '/home/ubuntu/hermes-dashboard-work', branch: 'main', remote: 'https://github.com/shubhsaxena2020/hermes-dashboard.git', dirty: 0 },
+    { repo: 'firecrawl', path: '/home/shubh_saxena2020/firecrawl', branch: 'main', remote: 'https://github.com/shubhsaxena2020/firecrawl.git', dirty: 2 },
+  ],
+}
+
+export const mockFiles: FilesResponse = {
+  root: '/srv/www',
+  entries: [
+    { name: '/shubhbuilds.com', size: '312M', path: '/srv/www/shubhbuilds.com' },
+    { name: '/control.shubhbuilds.com', size: '48M', path: '/srv/www/control.shubhbuilds.com' },
+    { name: '/firecrawl.shubhbuilds.com', size: '1.2G', path: '/srv/www/firecrawl.shubhbuilds.com' },
+  ],
+}
+
+export const mockBackups: BackupsResponse = {
+  root: '/var/backups',
+  backups: [
+    { name: 'shubhbuilds-2026-08-25.tar.gz', sizeBytes: 482_000_000, modifiedAt: Date.now() - 86_400_000 },
+    { name: 'shubhbuilds-2026-08-24.tar.gz', sizeBytes: 478_000_000, modifiedAt: Date.now() - 2 * 86_400_000 },
+  ],
+}
+
+export const mockDatabases: DatabasesResponse = {
+  databases: [
+    { name: 'postgres', image: 'postgres:16', up: true, status: 'Up 42 days' },
+    { name: 'firecrawl-staging-db-1', image: 'postgres:15', up: true, status: 'Up 12 days' },
+    { name: 'firecrawl-nuq-postgres-1', image: 'postgres:15', up: true, status: 'Up 12 days' },
+    { name: 'firecrawl-redis-1', image: 'redis:7', up: true, status: 'Up 12 days' },
   ],
 }

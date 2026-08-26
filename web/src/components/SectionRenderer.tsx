@@ -2,6 +2,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { DomainOverview } from '@/components/DomainOverview'
 import { OracleSection } from '@/components/OracleSection'
 import { SimplePanel } from '@/components/SimplePanel'
+import { SslPanel, GitPanel, FilesPanel, BackupPanel, DatabasesPanel } from '@/components/ServicePanels'
 import { NAV_BY_KEY, type SectionKey } from '@/lib/nav'
 import type { StatusResponse } from '@/lib/api'
 import { useDomains } from '@/hooks/useDomains'
@@ -37,12 +38,23 @@ export function SectionRenderer({
     case 'profile':
     case 'security':
     case 'subscription':
-    case 'databases':
-    case 'git':
-    case 'backup':
-    case 'files':
     case 'mail':
       body = <SimplePanel section={section} externalHref={NAV_BY_KEY[section]?.href} />
+      break
+    case 'databases':
+      body = <DatabasesPanel />
+      break
+    case 'git':
+      body = <GitPanel />
+      break
+    case 'backup':
+      body = <BackupPanel />
+      break
+    case 'files':
+      body = <FilesPanel />
+      break
+    case 'ssl':
+      body = <SslPanel data={data} />
       break
     default:
       body = (
