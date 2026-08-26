@@ -65,7 +65,7 @@ export const NAV_GROUPS: NavGroup[] = [
     title: 'Server Management',
     items: [
       { key: 'server', label: 'Server', icon: Server, hint: 'Containers, hardware & logs' },
-      { key: 'statistics', label: 'Statistics', icon: BarChart3, href: 'https://monitor.shubhbuilds.com', hint: 'Traffic & resource charts' },
+      { key: 'statistics', label: 'Statistics', icon: BarChart3, hint: 'CPU, memory, disk & uptime' },
       { key: 'logs', label: 'Logs', icon: ScrollText, hint: 'System & access logs' },
     ],
   },

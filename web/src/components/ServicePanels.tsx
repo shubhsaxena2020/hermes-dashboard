@@ -11,10 +11,19 @@ import {
   ShieldCheck,
   RefreshCw,
   CircleAlert,
+  Cpu,
+  MemoryStick,
+  HardDrive,
+  Clock,
+  ExternalLink,
+  Activity,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useJson } from '@/hooks/useJson'
 import { certBadgeVariant } from '@/lib/badge-utils'
+import { Progress } from '@/components/ui/progress'
+import { progressIndicatorClass } from '@/lib/color-threshold'
+import { formatBytes, parseSizeToBytes, parsePercent } from '@/lib/format'
 import type { StatusResponse } from '@/lib/api'
 
 function PanelShell({
@@ -195,6 +204,93 @@ export function DatabasesPanel() {
         <p className="text-sm text-muted-foreground">No database containers detected.</p>
       )}
     </PanelShell>
+  )
+}
+
+export function StatisticsPanel({ data }: { data: StatusResponse }) {
+  const usage = data.oracle.usage
+  const external = 'https://monitor.shubhbuilds.com'
+  const diskUsed = parseSizeToBytes(usage?.diskUsed)
+  const diskTotal = parseSizeToBytes(usage?.diskTotal)
+  const diskPct = parsePercent(usage?.diskPct)
+  const memPct =
+    usage?.memTotalMb != null
+      ? Math.round(((usage.memUsedMb ?? 0) / usage.memTotalMb) * 100)
+      : null
+  const cpuPct = usage?.cpuUsagePct != null ? Math.min(100, usage.cpuUsagePct) : null
+
+  const rows = [
+    { icon: Cpu, label: 'CPU', pct: cpuPct, detail: usage?.cpuUsagePct != null ? `${usage.cpuUsagePct}%` : '—' },
+    {
+      icon: MemoryStick,
+      label: 'Memory',
+      pct: memPct,
+      detail:
+        usage?.memUsedMb != null && usage?.memTotalMb != null
+          ? `${usage.memUsedMb} / ${usage.memTotalMb} MB`
+          : '—',
+    },
+    {
+      icon: HardDrive,
+      label: 'Disk',
+      pct: diskPct,
+      detail:
+        diskUsed != null && diskTotal != null
+          ? `${formatBytes(diskUsed)} / ${formatBytes(diskTotal)}`
+          : usage?.diskUsed ?? '—',
+    },
+  ]
+
+  const uptimeLabel =
+    usage?.uptimeSeconds != null
+      ? (() => {
+          const d = Math.floor(usage.uptimeSeconds / 86400)
+          const h = Math.floor((usage.uptimeSeconds % 86400) / 3600)
+          return `${d}d ${h}h`
+        })()
+      : '—'
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Activity className="size-4 text-brand" aria-hidden="true" />
+          Statistics
+        </CardTitle>
+        <a
+          href={external}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-1 text-xs text-brand hover:underline"
+        >
+          Open in Netdata
+          <ExternalLink className="size-3" aria-hidden="true" />
+        </a>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {rows.map((r) => (
+            <div key={r.label} className="space-y-1.5">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <r.icon className="size-4 text-brand" aria-hidden="true" />
+                {r.label}
+              </div>
+              {r.pct != null ? (
+                <Progress value={r.pct} indicatorClassName={progressIndicatorClass(r.pct)} />
+              ) : (
+                <div className="h-1.5 w-full rounded-full bg-muted" />
+              )}
+              <div className="text-xs tabular-nums text-foreground font-medium">{r.detail}</div>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 border-t border-border pt-3 text-sm text-muted-foreground">
+          <Clock className="size-4 text-brand" aria-hidden="true" />
+          Uptime
+          <span className="ml-auto text-foreground font-medium tabular-nums">{uptimeLabel}</span>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 

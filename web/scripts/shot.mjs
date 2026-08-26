@@ -82,7 +82,7 @@ await page.screenshot({ path: '/home/ubuntu/_render_server.png' })
 console.log('server view captured:', clicked)
 
 // Capture each wired service panel via the sidebar (real data render check).
-const PANELS = ['Databases', 'Git', 'Backup Manager', 'File Manager', 'SSL/TLS']
+const PANELS = ['Databases', 'Git', 'Backup Manager', 'File Manager', 'SSL/TLS', 'Statistics']
 for (const label of PANELS) {
   try {
     await page.click(`button:has-text("${label}")`, { timeout: 2000 })
