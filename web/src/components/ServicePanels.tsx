@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useState } from 'react'
 import {
   GitBranch,
   GitCommitHorizontal,
@@ -17,6 +18,7 @@ import {
   Clock,
   ExternalLink,
   Activity,
+  ScrollText,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useJson } from '@/hooks/useJson'
@@ -322,5 +324,83 @@ export function SslPanel({ data }: { data: StatusResponse }) {
         <p className="text-sm text-muted-foreground">No certificates reported.</p>
       )}
     </PanelShell>
+  )
+}
+
+export function LogsPanel({ data }: { data: StatusResponse }) {
+  const viewable = data.oracle.viewable ?? []
+  const stateByName = Object.fromEntries((data.oracle.containers ?? []).map((c) => [c.name, c]))
+  const [selected, setSelected] = useState<string | null>(viewable[0] ?? null)
+  const [logs, setLogs] = useState<string[] | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
+
+  async function load(name: string) {
+    setSelected(name)
+    setLoading(true)
+    setErr(null)
+    try {
+      const res = await api.oracleContainerLogs(name)
+      setLogs(res.logs)
+    } catch (e) {
+      setErr((e as Error).message || 'Failed to load logs')
+      setLogs(null)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardTitle className="flex items-center gap-2 text-base">
+          <ScrollText className="size-4 text-brand" aria-hidden="true" />
+          Logs
+        </CardTitle>
+        {selected && (
+          <Button type="button" size="sm" variant="ghost" className="text-muted-foreground" onClick={() => load(selected)} aria-label="Refresh logs">
+            <RefreshCw className="size-3.5" aria-hidden="true" />
+            Refresh
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-[200px_1fr]">
+          <ul className="space-y-1">
+            {viewable.map((name) => {
+              const up = stateByName[name]?.up
+              return (
+                <li key={name}>
+                  <button
+                    type="button"
+                    onClick={() => load(name)}
+                    className={`flex w-full items-center justify-between gap-2 rounded-md px-2.5 py-1.5 text-left text-sm ${
+                      selected === name ? 'bg-accent font-medium text-foreground' : 'text-muted-foreground hover:bg-accent'
+                    }`}
+                  >
+                    <span className="truncate">{name}</span>
+                    <span className={`size-2 shrink-0 rounded-full ${up ? 'bg-chart-2' : 'bg-destructive'}`} aria-hidden="true" />
+                  </button>
+                </li>
+              )
+            })}
+            {viewable.length === 0 && <li className="text-sm text-muted-foreground">No viewable containers.</li>}
+          </ul>
+          <div className="min-w-0">
+            {loading ? (
+              <Loading />
+            ) : err ? (
+              <ErrorNote msg={err} />
+            ) : logs ? (
+              <pre className="max-h-80 overflow-auto rounded-md bg-muted/60 p-3 text-xs leading-relaxed text-foreground">
+                {logs.length ? logs.join('\n') : 'No log output.'}
+              </pre>
+            ) : (
+              <p className="text-sm text-muted-foreground">Select a container to view its logs.</p>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

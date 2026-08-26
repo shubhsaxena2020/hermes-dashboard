@@ -48,6 +48,9 @@ for (const [ep, file] of [['git', '/tmp/git.json'], ['files', '/tmp/files.json']
     route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync(file, 'utf8') }),
   )
 }
+await page.route('**/api/oracle/containers/*/logs', (route) =>
+  route.fulfill({ status: 200, contentType: 'application/json', body: '{"logs":["2026-08-26T10:00:00Z app started","2026-08-26T10:00:01Z listening on :8080","2026-08-26T10:05:22Z GET / 200 14ms"]}' }),
+)
 
 await page.goto('http://127.0.0.1:4399/', { waitUntil: 'networkidle' })
 await page.waitForSelector('nav', { timeout: 5000 })
@@ -82,7 +85,7 @@ await page.screenshot({ path: '/home/ubuntu/_render_server.png' })
 console.log('server view captured:', clicked)
 
 // Capture each wired service panel via the sidebar (real data render check).
-const PANELS = ['Databases', 'Git', 'Backup Manager', 'File Manager', 'SSL/TLS', 'Statistics']
+const PANELS = ['Databases', 'Git', 'Backup Manager', 'File Manager', 'SSL/TLS', 'Statistics', 'Logs']
 for (const label of PANELS) {
   try {
     await page.click(`button:has-text("${label}")`, { timeout: 2000 })
