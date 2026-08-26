@@ -142,6 +142,12 @@ export function DomainOverview({
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {d.service ?? 'Web Hosting'} · {data.oracle.usage?.cpus ?? '?'} vCPU
+                  {d.ssl && !d.ssl.error && (
+                    <span className="ml-1 inline-flex items-center gap-1">
+                      · <ShieldCheck className="size-3" aria-hidden="true" />
+                      {d.ssl.issuer} · {d.ssl.daysRemaining ?? '?'}d
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
