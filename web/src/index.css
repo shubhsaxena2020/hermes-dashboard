@@ -88,14 +88,15 @@
     --brand: #00a8d8;
     --brand-foreground: #ffffff;
 
-    /* Sidebar — always dark slate, tuned to the Plesk Obsidian reference
-       (reference sidebar measured ~#31475a). */
-    --sidebar: #2b3b4c;
-    --sidebar-foreground: #c7d2dc;
-    --sidebar-muted: #93a4b3;
-    --sidebar-accent: #34495c;
-    --sidebar-active: #3a5167;
-    --sidebar-border: #34495c;
+    /* Sidebar — always dark slate, tuned 2026-08-26 to the Plesk Obsidian
+       reference. Measured reference sidebar avg (55,76,94) ≈ #374b5e; active
+       rows (91,116,134) ≈ #5b7486. */
+    --sidebar: #374b5e;
+    --sidebar-foreground: #d2dce4;
+    --sidebar-muted: #9fb0bf;
+    --sidebar-accent: #43596d;
+    --sidebar-active: #5b7486;
+    --sidebar-border: #43596d;
     --sidebar-ring: #00a8d8;
 }
 

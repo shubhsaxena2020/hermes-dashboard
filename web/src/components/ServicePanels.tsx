@@ -19,13 +19,15 @@ import {
   ExternalLink,
   Activity,
   ScrollText,
+  User,
+  CreditCard,
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useJson } from '@/hooks/useJson'
 import { certBadgeVariant } from '@/lib/badge-utils'
 import { Progress } from '@/components/ui/progress'
 import { progressIndicatorClass } from '@/lib/color-threshold'
-import { formatBytes, parseSizeToBytes, parsePercent } from '@/lib/format'
+import { formatBytes, parseSizeToBytes, parsePercent, formatDate } from '@/lib/format'
 import type { StatusResponse } from '@/lib/api'
 
 function PanelShell({
@@ -400,6 +402,85 @@ export function LogsPanel({ data }: { data: StatusResponse }) {
             )}
           </div>
         </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 py-2 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="text-foreground font-medium text-right truncate">{value}</span>
+    </div>
+  )
+}
+
+export function ProfilePanel({ data }: { data: StatusResponse }) {
+  const sub = data.subscription
+  const uptime = data.oracle.usage?.uptimeSeconds
+  const uptimeLabel =
+    uptime != null
+      ? (() => {
+          const d = Math.floor(uptime / 86400)
+          const h = Math.floor((uptime % 86400) / 3600)
+          return `${d}d ${h}h`
+        })()
+      : null
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center gap-2 space-y-0">
+        <User className="size-4 text-brand" aria-hidden="true" />
+        <CardTitle className="text-base">Profile &amp; System</CardTitle>
+      </CardHeader>
+      <CardContent className="divide-y divide-border">
+        <InfoRow label="Plan" value={sub?.planName ?? 'Web Host'} />
+        {sub?.systemIp && <InfoRow label="System IP" value={sub.systemIp} />}
+        {sub?.osLabel && <InfoRow label="Operating system" value={sub.osLabel} />}
+        {sub?.phpVersion && <InfoRow label="PHP version" value={sub.phpVersion} />}
+        {uptimeLabel && (
+          <div className="flex items-center justify-between gap-3 py-2 text-sm">
+            <span className="flex items-center gap-2 text-muted-foreground">
+              <Clock className="size-4 text-brand" aria-hidden="true" />
+              Server uptime
+            </span>
+            <span className="text-foreground font-medium tabular-nums">{uptimeLabel}</span>
+          </div>
+        )}
+        <p className="pt-3 text-xs text-muted-foreground">
+          These values are reported by the host. Account-level settings (password, 2FA) are managed
+          by your provider.
+        </p>
+      </CardContent>
+    </Card>
+  )
+}
+
+export function SubscriptionPanel({ data }: { data: StatusResponse }) {
+  const sub = data.subscription
+  const cost = data.costs?.main
+  const estimate = cost?.monthlyEstimate
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center gap-2 space-y-0">
+        <CreditCard className="size-4 text-brand" aria-hidden="true" />
+        <CardTitle className="text-base">Subscription</CardTitle>
+      </CardHeader>
+      <CardContent className="divide-y divide-border">
+        <div className="pb-3">
+          <div className="text-lg font-semibold text-foreground">{sub?.planName ?? 'Web Host'}</div>
+          {cost?.machineType && (
+            <div className="text-sm text-muted-foreground">{cost.machineType}</div>
+          )}
+        </div>
+        {sub?.renewalDate && <InfoRow label="Renews" value={formatDate(sub.renewalDate)} />}
+        {sub?.systemIp && <InfoRow label="System IP" value={sub.systemIp} />}
+        {sub?.phpVersion && <InfoRow label="PHP" value={sub.phpVersion} />}
+        {sub?.osLabel && <InfoRow label="OS" value={sub.osLabel} />}
+        {estimate != null && (
+          <InfoRow label="Monthly estimate" value={`$${estimate.toFixed(2)}`} />
+        )}
+        {cost?.note && <p className="pt-3 text-xs text-muted-foreground">{cost.note}</p>}
       </CardContent>
     </Card>
   )
