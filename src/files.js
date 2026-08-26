@@ -1,6 +1,7 @@
 const { execFile } = require('child_process')
 const { promisify } = require('util')
 const execFileAsync = promisify(execFile)
+const { createCache } = require('./cache')
 
 // Reports the contents of a web/asset root directory with per-entry sizes via
 // `du`. Useful as the backend behind the File Manager panel. The root is
@@ -8,15 +9,13 @@ const execFileAsync = promisify(execFile)
 // exist we return an empty listing rather than erroring.
 const FILES_ROOT = process.env.FILES_ROOT || '/srv/www'
 const CACHE_MS = 30 * 1000
-let cached = null
-let cachedAt = 0
+const EMPTY = { root: FILES_ROOT, entries: [] }
+const get = createCache(CACHE_MS, EMPTY)
 
 async function getFiles() {
-  if (cached && Date.now() - cachedAt < CACHE_MS) return cached
-  let entries
-  try {
+  return get(async () => {
     const { stdout } = await execFileAsync('du', ['-sh', '--max-depth=1', FILES_ROOT])
-    entries = stdout
+    const entries = stdout
       .trim()
       .split('\n')
       .filter(Boolean)
@@ -26,12 +25,8 @@ async function getFiles() {
         return { name: name || '/', size: size.trim(), path: p }
       })
       .filter((e) => e.name !== '/') // the root itself
-  } catch {
-    entries = []
-  }
-  cached = { root: FILES_ROOT, entries }
-  cachedAt = Date.now()
-  return cached
+    return { root: FILES_ROOT, entries }
+  })
 }
 
 module.exports = { getFiles, FILES_ROOT }
