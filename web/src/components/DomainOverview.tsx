@@ -16,7 +16,7 @@ const QUICK_ACTIONS: { key: SectionKey; label: string; hint?: string }[] = [
   { key: 'mail', label: 'Mail', hint: 'Email accounts' },
 ]
 
-function QuickActions({ onNavigate }: { onNavigate: (k: SectionKey) => void }) {
+function QuickActions({ domain, onNavigate }: { domain: string; onNavigate: (k: SectionKey) => void }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
       {QUICK_ACTIONS.map((action) => {
@@ -43,6 +43,7 @@ function QuickActions({ onNavigate }: { onNavigate: (k: SectionKey) => void }) {
             key={action.key}
             type="button"
             onClick={() => onNavigate(action.key)}
+            aria-label={`${action.label} for ${domain}`}
             className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 text-left hover:bg-accent transition-colors"
           >
             {Icon && <Icon className="size-5 text-brand shrink-0" aria-hidden="true" />}
@@ -126,7 +127,19 @@ export function DomainOverview({
                 <Globe className="size-5 text-brand" aria-hidden="true" />
               </div>
               <div className="min-w-0">
-                <div className="text-base font-semibold text-foreground truncate">{d.domain}</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base font-semibold text-foreground truncate">{d.domain}</span>
+                  <a
+                    href={`https://${d.domain}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-brand hover:underline shrink-0"
+                    aria-label={`Visit ${d.domain} in a new tab`}
+                  >
+                    Visit
+                    <ExternalLink className="size-3" aria-hidden="true" />
+                  </a>
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {d.service ?? 'Web Hosting'} · {data.oracle.usage?.cpus ?? '?'} vCPU
                 </div>
@@ -145,7 +158,7 @@ export function DomainOverview({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <QuickActions onNavigate={onNavigate} />
+            <QuickActions domain={d.domain} onNavigate={onNavigate} />
           </CardContent>
         </Card>
         )
