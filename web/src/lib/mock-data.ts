@@ -75,3 +75,17 @@ export const mockStatus: StatusResponse = {
     osLabel: 'Ubuntu 22.04 LTS',
   },
 }
+
+import type { DomainsResponse } from '@/lib/api'
+
+// Mirrors the real /api/domains shape (src/domains.js).
+export const mockDomains: DomainsResponse = {
+  domains: [
+    { domain: 'shubhbuilds.com', service: 'vps-control', reachable: true, httpStatus: 200, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-10-15T00:00:00Z', daysRemaining: 51 } },
+    { domain: 'control.shubhbuilds.com', service: 'vps-control', reachable: true, httpStatus: 200, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-09-22T00:00:00Z', daysRemaining: 28 } },
+    { domain: 'leads.shubhbuilds.com', service: null, reachable: true, httpStatus: 200, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-08-30T00:00:00Z', daysRemaining: 5 } },
+    { domain: 'portainer.shubhbuilds.com', service: 'portainer', reachable: true, httpStatus: 200, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-12-01T00:00:00Z', daysRemaining: 98 } },
+    { domain: 'monitor.shubhbuilds.com', service: 'netdata', reachable: true, httpStatus: 200, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-11-10T00:00:00Z', daysRemaining: 77 } },
+    { domain: 'firecrawl.shubhbuilds.com', service: 'firecrawl', reachable: false, httpStatus: null, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-07-02T00:00:00Z', daysRemaining: undefined, error: 'certificate expired' } },
+  ],
+}

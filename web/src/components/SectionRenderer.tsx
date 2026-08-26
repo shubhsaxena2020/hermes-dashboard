@@ -4,6 +4,7 @@ import { OracleSection } from '@/components/OracleSection'
 import { SimplePanel } from '@/components/SimplePanel'
 import { NAV_BY_KEY, type SectionKey } from '@/lib/nav'
 import type { StatusResponse } from '@/lib/api'
+import { useDomains } from '@/hooks/useDomains'
 
 export function SectionRenderer({
   section,
@@ -15,11 +16,18 @@ export function SectionRenderer({
   onNavigate: (key: SectionKey) => void
 }) {
   const label = NAV_BY_KEY[section]?.label ?? section
+  const { data: domainsData } = useDomains()
 
   let body: React.ReactNode
   switch (section) {
     case 'domains':
-      body = <DomainOverview data={data} onNavigate={onNavigate} />
+      body = (
+        <DomainOverview
+          data={data}
+          domains={domainsData?.domains ?? []}
+          onNavigate={onNavigate}
+        />
+      )
       break
     case 'server':
       body = <OracleSection oracle={data.oracle} refresh={() => {}} />
@@ -37,7 +45,13 @@ export function SectionRenderer({
       body = <SimplePanel section={section} externalHref={NAV_BY_KEY[section]?.href} />
       break
     default:
-      body = <DomainOverview data={data} onNavigate={onNavigate} />
+      body = (
+        <DomainOverview
+          data={data}
+          domains={domainsData?.domains ?? []}
+          onNavigate={onNavigate}
+        />
+      )
   }
 
   return (

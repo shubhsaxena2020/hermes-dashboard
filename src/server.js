@@ -9,6 +9,7 @@ const oracleHardware = require('./oracle-hardware')
 const firecrawlRelay = require('./firecrawl-relay')
 const tlsStatus = require('./tls-status')
 const costEstimate = require('./cost-estimate')
+const domains = require('./domains')
 const traffic = require('./traffic')
 const { getVersion } = require('./version')
 
@@ -115,6 +116,14 @@ app.get('/api/oracle/containers/:name/logs', async (req, res) => {
   }
 })
 
+app.get('/api/domains', async (req, res) => {
+  try {
+    const list = await domains.getDomains()
+    res.json({ domains: list })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
 app.get('/api/version', (req, res) => {
   res.json(getVersion())
 })

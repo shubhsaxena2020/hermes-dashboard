@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Globe, ShieldCheck, ExternalLink } from 'lucide-react'
-import type { StatusResponse } from '@/lib/api'
+import type { DomainInfo, StatusResponse } from '@/lib/api'
 import { NAV_GROUPS, type SectionKey } from '@/lib/nav'
 import { certBadgeVariant } from '@/lib/badge-utils'
 
@@ -59,21 +59,14 @@ function QuickActions({ onNavigate }: { onNavigate: (k: SectionKey) => void }) {
 
 export function DomainOverview({
   data,
+  domains,
   onNavigate,
 }: {
   data: StatusResponse
+  domains: DomainInfo[]
   onNavigate: (key: SectionKey) => void
 }) {
   const certs = data.tls ?? []
-  // One card per hosted domain (driven by the real TLS list from the backend).
-  const domains = certs.map((c) => ({
-    name: c.domain,
-    expiresLabel: c.validTo
-      ? new Date(c.validTo).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-      : null,
-    daysRemaining: c.daysRemaining,
-    error: !!c.error,
-  }))
 
   const upCount = data.oracle.containers.filter((c) => c.up).length
   const total = data.oracle.containers.length
@@ -92,7 +85,7 @@ export function DomainOverview({
         </Badge>
       </div>
 
-      {/* Empty state when no domains/certs are reported by the backend. */}
+      {/* Empty state when no domains are reported by the backend. */}
       {domains.length === 0 && (
         <Card>
           <CardContent className="flex flex-col items-center gap-2 py-10 text-center">
@@ -109,37 +102,54 @@ export function DomainOverview({
       )}
 
       {/* A per-domain card, each with its own quick-action row (Plesk-style). */}
-      {domains.map((d) => (
-        <Card key={d.name}>
+      {domains.map((d) => {
+        const ssl = d.ssl
+        const days = ssl?.daysRemaining
+        const sslError = !!ssl?.error
+        const statusVariant = !d.reachable
+          ? 'destructive'
+          : sslError || (days != null && days < 14)
+            ? 'destructive'
+            : 'default'
+        const statusLabel = !d.reachable
+          ? 'Unreachable'
+          : sslError
+            ? 'SSL error'
+            : days != null && days < 14
+              ? 'Expiring'
+              : 'Active'
+        return (
+        <Card key={d.domain}>
           <CardContent className="flex items-center justify-between gap-4 py-4 border-b border-border">
             <div className="flex items-center gap-3 min-w-0">
               <div className="size-10 rounded-lg bg-brand/10 flex items-center justify-center shrink-0">
                 <Globe className="size-5 text-brand" aria-hidden="true" />
               </div>
               <div className="min-w-0">
-                <div className="text-base font-semibold text-foreground truncate">{d.name}</div>
+                <div className="text-base font-semibold text-foreground truncate">{d.domain}</div>
                 <div className="text-xs text-muted-foreground">
-                  {data.subscription?.planName ?? 'Web Hosting'} · {data.oracle.usage?.cpus ?? '?'} vCPU
+                  {d.service ?? 'Web Hosting'} · {data.oracle.usage?.cpus ?? '?'} vCPU
                 </div>
               </div>
             </div>
             <Badge
-              variant={d.error ? 'destructive' : d.daysRemaining != null && d.daysRemaining < 14 ? 'destructive' : 'default'}
-              className={d.error || (d.daysRemaining != null && d.daysRemaining < 14) ? '' : 'bg-chart-2/15 text-chart-2 border-chart-2/30'}
+              variant={statusVariant}
+              className={statusVariant === 'default' ? 'bg-chart-2/15 text-chart-2 border-chart-2/30' : ''}
             >
-              {d.error ? 'SSL error' : d.daysRemaining != null && d.daysRemaining < 14 ? 'Expiring' : 'Active'}
+              {statusLabel}
             </Badge>
           </CardContent>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Quick actions for {d.name}
+              Quick actions for {d.domain}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <QuickActions onNavigate={onNavigate} />
           </CardContent>
         </Card>
-      ))}
+        )
+      })}
 
       {/* Full SSL / TLS certificate roster. */}
       <Card>

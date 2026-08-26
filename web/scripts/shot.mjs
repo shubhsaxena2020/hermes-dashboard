@@ -40,6 +40,9 @@ await page.route('**/api/status', (route) =>
 await page.route('**/api/version', (route) =>
   route.fulfill({ status: 200, contentType: 'application/json', body: '{"commit":"abc1234","date":null}' }),
 )
+await page.route('**/api/domains', (route) =>
+  route.fulfill({ status: 200, contentType: 'application/json', body: fs.readFileSync('/tmp/domains.json', 'utf8') }),
+)
 
 await page.goto('http://127.0.0.1:4399/', { waitUntil: 'networkidle' })
 await page.waitForSelector('nav', { timeout: 5000 })

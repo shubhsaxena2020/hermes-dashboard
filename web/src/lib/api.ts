@@ -44,6 +44,26 @@ export interface TrafficUsage {
   resetLabel?: string | null
 }
 
+export interface DomainSslInfo {
+  issuer?: string | null
+  validTo?: string | null
+  daysRemaining?: number | null
+  error?: string | null
+}
+
+export interface DomainInfo {
+  domain: string
+  /** The container/app that backs this domain, if known. */
+  service?: string | null
+  reachable: boolean
+  httpStatus?: number | null
+  ssl?: DomainSslInfo | null
+}
+
+export interface DomainsResponse {
+  domains: DomainInfo[]
+}
+
 export interface SubscriptionInfo {
   planName?: string | null
   renewalDate?: string | null
@@ -92,4 +112,9 @@ export const api = {
   oracleContainerLogs: (name: string) => req<{ logs: string[] }>(`/api/oracle/containers/${name}/logs`),
 
   version: () => req<{ commit: string | null; date: string | null }>('/api/version'),
+
+  domains: () =>
+    USE_MOCK
+      ? import('@/lib/mock-data').then((m) => m.mockDomains as DomainsResponse)
+      : req<DomainsResponse>('/api/domains'),
 }
