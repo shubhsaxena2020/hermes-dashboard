@@ -34,11 +34,15 @@ function PanelShell({
   title,
   icon,
   onRefresh,
+  loading = false,
+  error = null,
   children,
 }: {
   title: string
   icon: React.ReactNode
   onRefresh: () => void
+  loading?: boolean
+  error?: string | null
   children: React.ReactNode
 }) {
   return (
@@ -53,7 +57,9 @@ function PanelShell({
           Refresh
         </Button>
       </CardHeader>
-      <CardContent>{children}</CardContent>
+      <CardContent>
+        {loading ? <Loading /> : error ? <ErrorNote msg={error} /> : children}
+      </CardContent>
     </Card>
   )
 }
@@ -298,10 +304,17 @@ export function StatisticsPanel({ data }: { data: StatusResponse }) {
   )
 }
 
-export function SslPanel({ data }: { data: StatusResponse }) {
-  const certs = data.tls ?? []
+export function SslPanel() {
+  const { data, loading, error, refresh } = useJson<{ certs: StatusResponse['tls'] }>(api.ssl)
+  const certs = data?.certs ?? []
   return (
-    <PanelShell title="SSL/TLS Certificates" icon={<ShieldCheck className="size-4 text-brand" aria-hidden="true" />} onRefresh={() => {}}>
+    <PanelShell
+      title="SSL/TLS Certificates"
+      icon={<ShieldCheck className="size-4 text-brand" aria-hidden="true" />}
+      onRefresh={refresh}
+      loading={loading}
+      error={error}
+    >
       {certs.length ? (
         <ul className="divide-y divide-border">
           {certs.map((cert) => {

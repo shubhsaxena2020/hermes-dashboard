@@ -62,7 +62,7 @@ export function SectionRenderer({
       body = <FilesPanel />
       break
     case 'ssl':
-      body = <SslPanel data={data} />
+      body = <SslPanel />
       break
     default:
       body = (

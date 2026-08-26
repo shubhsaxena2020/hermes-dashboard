@@ -1,4 +1,4 @@
-import type { StatusResponse, GitResponse, FilesResponse, BackupsResponse, DatabasesResponse } from '@/lib/api'
+import type { StatusResponse, GitResponse, FilesResponse, BackupsResponse, DatabasesResponse, SslResponse } from '@/lib/api'
 
 // Deterministic mock so the dashboard can be rendered and visually verified
 // without a live backend (used with VITE_MOCK=1). Mirrors the real
@@ -87,6 +87,18 @@ export const mockDomains: DomainsResponse = {
     { domain: 'portainer.shubhbuilds.com', service: 'portainer', reachable: true, httpStatus: 200, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-12-01T00:00:00Z', daysRemaining: 98 } },
     { domain: 'monitor.shubhbuilds.com', service: 'netdata', reachable: true, httpStatus: 200, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-11-10T00:00:00Z', daysRemaining: 77 } },
     { domain: 'firecrawl.shubhbuilds.com', service: 'firecrawl', reachable: false, httpStatus: null, ssl: { issuer: "Let's Encrypt R3", validTo: '2026-07-02T00:00:00Z', daysRemaining: undefined, error: 'certificate expired' } },
+  ],
+}
+
+// Canonical SSL/TLS roster (mirrors /api/ssl -> src/ssl.js -> tls-status).
+export const mockSsl: SslResponse = {
+  certs: [
+    { domain: 'shubhbuilds.com', issuer: "Let's Encrypt R3", validTo: '2026-10-15T00:00:00Z', daysRemaining: 51 },
+    { domain: 'control.shubhbuilds.com', issuer: "Let's Encrypt R3", validTo: '2026-09-22T00:00:00Z', daysRemaining: 28 },
+    { domain: 'leads.shubhbuilds.com', issuer: "Let's Encrypt R3", validTo: '2026-08-30T00:00:00Z', daysRemaining: 5 },
+    { domain: 'portainer.shubhbuilds.com', issuer: "Let's Encrypt R3", validTo: '2026-12-01T00:00:00Z', daysRemaining: 98 },
+    { domain: 'monitor.shubhbuilds.com', issuer: "Let's Encrypt R3", validTo: '2026-11-10T00:00:00Z', daysRemaining: 77 },
+    { domain: 'firecrawl.shubhbuilds.com', issuer: "Let's Encrypt R3", validTo: '2026-07-02T00:00:00Z', daysRemaining: undefined, error: 'certificate expired' },
   ],
 }
 

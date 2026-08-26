@@ -64,6 +64,10 @@ export interface DomainsResponse {
   domains: DomainInfo[]
 }
 
+export interface SslResponse {
+  certs: TlsCertStatus[]
+}
+
 export interface GitRepo {
   repo: string
   path: string
@@ -162,6 +166,11 @@ export const api = {
     USE_MOCK
       ? import('@/lib/mock-data').then((m) => m.mockDomains as DomainsResponse)
       : req<DomainsResponse>('/api/domains'),
+
+  ssl: () =>
+    USE_MOCK
+      ? import('@/lib/mock-data').then((m) => m.mockSsl as SslResponse)
+      : req<SslResponse>('/api/ssl'),
 
   git: () =>
     USE_MOCK

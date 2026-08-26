@@ -8,6 +8,7 @@ const oracleDocker = require('./oracle-docker-control')
 const oracleHardware = require('./oracle-hardware')
 const firecrawlRelay = require('./firecrawl-relay')
 const tlsStatus = require('./tls-status')
+const ssl = require('./ssl')
 const costEstimate = require('./cost-estimate')
 const domains = require('./domains')
 const git = require('./git')
@@ -117,6 +118,14 @@ app.get('/api/oracle/containers/:name/logs', async (req, res) => {
     res.json({ logs })
   } catch (err) {
     res.status(400).json({ error: err.message })
+  }
+})
+
+app.get('/api/ssl', async (req, res) => {
+  try {
+    res.json(await ssl.getSsl())
+  } catch (err) {
+    res.status(500).json({ error: err.message })
   }
 })
 
