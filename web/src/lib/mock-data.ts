@@ -45,6 +45,7 @@ export const mockStatus: StatusResponse = {
       diskUsed: '31G',
       diskPct: '40%',
       uptimeSeconds: 3672000,
+      loadAvg: { one: 0.42, five: 0.55, fifteen: 0.61 },
     },
   },
   tls: [

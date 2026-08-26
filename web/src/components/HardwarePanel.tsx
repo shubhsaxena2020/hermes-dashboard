@@ -54,6 +54,15 @@ export function HardwarePanel({ usage }: { usage?: HardwareUsage | null }) {
             </div>
             <Progress value={diskPct} indicatorClassName={progressIndicatorClass(diskPct)} />
           </div>
+          {usage.loadAvg && (
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Load average</span>
+              <span className="tabular-nums">
+                {usage.loadAvg.one} · {usage.loadAvg.five} · {usage.loadAvg.fifteen}
+                <span className="text-muted-foreground"> (1m/5m/15m)</span>
+              </span>
+            </div>
+          )}
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">Live usage unavailable.</p>

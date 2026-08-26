@@ -37,33 +37,53 @@ function sampleCpuUsage() {
 // Runs on the same machine as the containers -- no SSH needed, same pattern
 // as oracle-status.js. Oracle's spec doesn't change (no start/stop lifecycle
 // like GCP), so "hardware" here is just the current live reading.
+//
+// CPU/memory/uptime/load are read from Node's `os` module (no external
+// binaries needed -- robust on minimal images that lack `free`/`nproc`). Disk
+// is the one thing `os` can't provide, so we still shell out to `df`, but that
+// single call is guarded so a missing `df` degrades to null disk fields
+// instead of taking down the whole hardware payload.
 async function getHardwareUsage() {
-  const [cpuOut, memOut, diskOut, cpuUsagePct] = await Promise.all([
-    execFileAsync('nproc', []),
-    execFileAsync('free', ['-m']),
-    execFileAsync('df', ['-h', '/']),
-    sampleCpuUsage(),
-  ])
+  const cpuUsagePct = await sampleCpuUsage()
 
-  const cpus = Number(cpuOut.stdout.trim()) || null
+  const totalMemBytes = os.totalmem()
+  const freeMemBytes = os.freemem()
+  const memTotalMb = Math.round(totalMemBytes / (1024 * 1024))
+  // `free` reports used = total - free - buffers/cache; approximate with
+  // total - free, which is what the panel cares about for the usage bar.
+  const memUsedMb = Math.round((totalMemBytes - freeMemBytes) / (1024 * 1024))
 
-  const memLine = memOut.stdout.split('\n').find((l) => l.startsWith('Mem:'))
-  const memParts = memLine ? memLine.trim().split(/\s+/) : []
-  const memTotalMb = memParts[1] ? Number(memParts[1]) : null
-  const memUsedMb = memParts[2] ? Number(memParts[2]) : null
+  const load = os.loadavg()
+  const loadAvg = {
+    one: Number(load[0].toFixed(2)),
+    five: Number(load[1].toFixed(2)),
+    fifteen: Number(load[2].toFixed(2)),
+  }
 
-  const diskLine = diskOut.stdout.split('\n')[1]
-  const diskParts = diskLine ? diskLine.trim().split(/\s+/) : []
+  let diskTotal = null
+  let diskUsed = null
+  let diskPct = null
+  try {
+    const { stdout } = await execFileAsync('df', ['-h', '/'])
+    const diskLine = stdout.split('\n')[1]
+    const diskParts = diskLine ? diskLine.trim().split(/\s+/) : []
+    diskTotal = diskParts[1] || null
+    diskUsed = diskParts[2] || null
+    diskPct = diskParts[4] || null
+  } catch {
+    // df unavailable -- disk fields stay null, the rest of the payload is fine.
+  }
 
   return {
-    cpus,
+    cpus: os.cpus().length || null,
     cpuUsagePct,
     memTotalMb,
     memUsedMb,
-    diskTotal: diskParts[1] || null,
-    diskUsed: diskParts[2] || null,
-    diskPct: diskParts[4] || null,
+    diskTotal,
+    diskUsed,
+    diskPct,
     uptimeSeconds: Math.floor(os.uptime()),
+    loadAvg,
   }
 }
 

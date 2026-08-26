@@ -6,6 +6,12 @@ export interface ContainerInfo {
   mem?: string
 }
 
+export interface LoadAvg {
+  one: number
+  five: number
+  fifteen: number
+}
+
 export interface HardwareUsage {
   cpus: number | null
   cpuUsagePct: number | null
@@ -15,6 +21,7 @@ export interface HardwareUsage {
   diskUsed: string | null
   diskPct: string | null
   uptimeSeconds: number | null
+  loadAvg?: LoadAvg | null
 }
 
 export type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
