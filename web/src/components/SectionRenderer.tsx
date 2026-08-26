@@ -10,11 +10,13 @@ import { useDomains } from '@/hooks/useDomains'
 export function SectionRenderer({
   section,
   data,
+  focusDomain,
   onNavigate,
 }: {
   section: SectionKey
   data: StatusResponse
-  onNavigate: (key: SectionKey) => void
+  focusDomain?: string | null
+  onNavigate: (key: SectionKey, domain?: string) => void
 }) {
   const label = NAV_BY_KEY[section]?.label ?? section
   const { data: domainsData } = useDomains()
@@ -64,7 +66,7 @@ export function SectionRenderer({
       body = <FilesPanel />
       break
     case 'ssl':
-      body = <SslPanel />
+      body = <SslPanel focusDomain={focusDomain} />
       break
     default:
       body = (

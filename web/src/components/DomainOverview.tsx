@@ -16,7 +16,7 @@ const QUICK_ACTIONS: { key: SectionKey; label: string; hint?: string }[] = [
   { key: 'mail', label: 'Mail', hint: 'Email accounts' },
 ]
 
-function QuickActions({ domain, onNavigate }: { domain: string; onNavigate: (k: SectionKey) => void }) {
+function QuickActions({ domain, onNavigate }: { domain: string; onNavigate: (k: SectionKey, domain?: string) => void }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
       {QUICK_ACTIONS.map((action) => {
@@ -42,7 +42,7 @@ function QuickActions({ domain, onNavigate }: { domain: string; onNavigate: (k: 
           <button
             key={action.key}
             type="button"
-            onClick={() => onNavigate(action.key)}
+            onClick={() => onNavigate(action.key, domain)}
             aria-label={`${action.label} for ${domain}`}
             className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5 text-left hover:bg-accent transition-colors"
           >
@@ -65,7 +65,7 @@ export function DomainOverview({
 }: {
   data: StatusResponse
   domains: DomainInfo[]
-  onNavigate: (key: SectionKey) => void
+  onNavigate: (key: SectionKey, domain?: string) => void
 }) {
   const certs = data.tls ?? []
 

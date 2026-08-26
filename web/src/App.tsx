@@ -26,6 +26,7 @@ function LoadingSkeleton() {
 
 function App() {
   const [section, setSection] = useState<SectionKey>('domains')
+  const [focusDomain, setFocusDomain] = useState<string | null>(null)
   const { data, lastUpdated, error, responseMs, refresh } = useStatus()
   const [, forceTick] = useState(0)
   const [version, setVersion] = useState<{ commit: string | null; date: string | null } | null>(null)
@@ -202,7 +203,15 @@ function App() {
                     Refresh
                   </Button>
                 </div>
-                <SectionRenderer section={section} data={data} onNavigate={setSection} />
+                <SectionRenderer
+                  section={section}
+                  data={data}
+                  focusDomain={focusDomain}
+                  onNavigate={(key, domain) => {
+                    setSection(key)
+                    setFocusDomain(domain ?? null)
+                  }}
+                />
               </div>
 
               <RightRail data={data} />

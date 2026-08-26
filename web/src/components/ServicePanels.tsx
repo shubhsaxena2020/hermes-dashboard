@@ -304,7 +304,7 @@ export function StatisticsPanel({ data }: { data: StatusResponse }) {
   )
 }
 
-export function SslPanel() {
+export function SslPanel({ focusDomain }: { focusDomain?: string | null }) {
   const { data, loading, error, refresh } = useJson<{ certs: StatusResponse['tls'] }>(api.ssl)
   const certs = data?.certs ?? []
   return (
@@ -318,12 +318,16 @@ export function SslPanel() {
       {certs.length ? (
         <ul className="divide-y divide-border">
           {certs.map((cert) => {
+            const isFocus = focusDomain != null && cert.domain === focusDomain
             const expiryDate = cert.validTo ? new Date(cert.validTo) : null
             const expiryLabel = expiryDate
               ? expiryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
               : null
             return (
-              <li key={cert.domain} className="flex items-center justify-between gap-3 py-2.5">
+              <li
+                key={cert.domain}
+                className={`flex items-center justify-between gap-3 py-2.5${isFocus ? ' rounded-md bg-brand/10 -mx-2 px-2 ring-1 ring-brand/40' : ''}`}
+              >
                 <div className="min-w-0">
                   <div className="text-sm font-medium text-foreground truncate">{cert.domain}</div>
                   {expiryLabel && <div className="text-xs text-muted-foreground">Expires {expiryLabel}</div>}
