@@ -1,107 +1,166 @@
-# vps-control
+# Hermes Dashboard
 
-Dashboard to start/stop the GCP `firecrawl-host` VPS on demand and see both
-VPS's status in one place. Design spec: `docs/superpowers/specs/2026-07-08-vps-control-dashboard-design.md`.
+> **Version: v55** — Multi-service VPS control panel and fleet management dashboard.
 
-## Status: live at https://control.shubhbuilds.com
+A modern, responsive hosting management dashboard (inspired by Plesk/cPanel) designed to monitor and operate cloud infrastructure, containerized services, domains, SSL posture, and system health in a single unified interface.
 
-Everything is deployed and tested end-to-end: Oracle status, GCP status,
-Start/Stop buttons, live queue/container/log detail while GCP is on, and
-auto-idle-shutdown. Login credentials are in `.env` on Oracle VPS (not
-committed to git).
+Live deployment: [control.shubhbuilds.com](https://control.shubhbuilds.com)
 
-### Features
+---
 
-- **Overview tab**: VPS status with uptime, TLS certificate expiry, estimated monthly cost
-- **VPS tab**: live hardware usage (CPU, memory, disk), container table with start/stop/restart controls, log viewer with line filtering and auto-refresh
-- **Dark mode**: toggle in the sidebar; defaults to system preference
-- **Auto-polling**: status refreshes every 5 seconds; manual refresh and error indicator in the toolbar
-- **Keyboard shortcuts**: Alt+1 for Overview, Alt+2 for VPS tab
+## Overview & Key Capabilities
 
-### Changelog
+Hermes Dashboard provides an intuitive control surface for server fleet operations, combining host telemetry, container orchestration, and security inspection:
 
-- **iter-50** — Dark mode toggle: added ThemeProvider (next-themes) in main.tsx, Sun/Moon toggle button in sidebar (App.tsx).
-- **iter-51** — Error state tracking: useStatus hook now surfaces poll errors; "Stale — poll failed" indicator added to toolbar; manual Refresh button with aria-label added.
-- **iter-52** — UI polish: upgraded Refresh to shadcn Button with RefreshCw icon; normalized all action buttons to size="default" (sm→default); added aria-current on nav items; added flex-wrap on toolbar; added Features section to README.
-- **iter-53** — Architecture: extracted sidebar navigation into dedicated Sidebar.tsx component, reducing App.tsx from 107 to 78 lines.
-- **iter-54** — Loading skeleton: added skeleton placeholder for initial data fetch.
-- **iter-55** — Responsive sidebar: added hamburger menu for mobile with slide-in overlay, keyboard accessibility (Escape key, focus management), and responsive main padding.
-- **iter-56** — Error boundary: added class-based ErrorBoundary component wrapping section content; catches render crashes with a labeled recovery card and "Try again" button.
-- **iter-57** — Hardware panel visual feedback: added color-coded progress bars (yellow ≥60%, red ≥80%) and inline memory percentage for at-a-glance resource health.
-- **iter-58** — Accessibility: added aria-hidden="true" to decorative SVG icons in hamburger menu, refresh button, and theme toggle for cleaner screen reader output.
-- **iter-59** — Overview health card: added compact memory and disk progress bars to the Overview tab so system health is visible at a glance without switching to the VPS tab.
-- **iter-60** — Quick links restyle: converted plain anchor links to outlined buttons with external-link icons; added flex-wrap for responsive wrapping on narrow viewports; updated loading skeleton to match.
-- **iter-61** — CPU usage monitoring: added real-time host CPU utilization via os.cpus() sampling on the server; new color-coded progress bar in both the VPS Hardware panel and Overview system health card, completing the hardware monitoring triad (CPU, memory, disk).
-- **iter-62** — Extract shared color threshold utility: removed duplicated progressIndicatorClass/healthIndicatorClass from HardwarePanel and OverviewSection, consolidated into web/src/lib/color-threshold.ts.
-- **iter-63** — API response time: useStatus hook now tracks fetch duration via performance.now(); toolbar displays response time (e.g. "45ms") next to the "Updated" label so connection health is visible at a glance.
-- **iter-64** — Loading skeleton toolbar: added skeleton placeholders for the Updated/response-time/Refresh toolbar row to eliminate layout shift on initial data load.
-- **iter-65** — TLS expiry dates: each certificate card now shows the formatted expiry date (e.g. "Expires Sep 15, 2026") below the domain name, and issuer info is available via hover tooltip.
-- **iter-66** — Smarter time formatting: the "Updated" toolbar label now shows minutes, hours, or days instead of raw seconds.
-- **iter-67** — Keyboard shortcuts: Alt+1 switches to Overview, Alt+2 switches to VPS tab, enabling fast keyboard-driven navigation without using the sidebar.
-- **iter-68** — Connection health indicator: added a colored status dot to the toolbar (green = connected, red = disconnected) for at-a-glance backend health visibility.
-- **iter-69** — VPS uptime: added os.uptime() to the backend hardware payload; Overview VPS card now displays uptime (e.g. "12d 5h") for at-a-glance server stability visibility.
-- **iter-70** — Keyboard shortcut hints: added `<kbd>` visual indicators next to sidebar nav items (Alt+1, Alt+2) on desktop for discoverability.
-- **iter-71** — Container resource bars: added inline CPU% and Memory% progress bars to each container row in the infrastructure table, replacing raw text with color-coded visual indicators for at-a-glance resource monitoring.
-- **iter-72** — Down-container names: Overview VPS card now shows which containers are down by name, reducing the need to switch to the VPS tab for status triage.
-- **iter-73** — Container actions responsive wrap: action buttons (Start/Stop/Restart/Logs) in the infrastructure table now wrap on narrow viewports instead of overflowing, fixing a mobile responsiveness regression.
-- **iter-75** — Container status accessibility: added colored dot indicator to the status column for colorblind users (non-color signaling).
-- **iter-76** — TLS cert urgency sort: certificates are now sorted by days remaining (ascending), with error certs first, so the most urgent renewal appears at a glance.
-- **iter-77** — VPS tab container health: added "{up}/{total} up" badge to the VPS tab header for at-a-glance container health visibility.
-- **iter-78** — Container table sorting: added clickable sort controls (Name, Status, CPU, MEM) above the infrastructure table with direction indicators, enabling quick identification of resource-heavy or stopped containers.
-- **iter-79** — Sort controls responsive wrap: added flex-wrap to the container table sort bar so sort buttons wrap on narrow viewports instead of overflowing, matching the action-button wrap pattern from iter-73.
-- **iter-80** — Container name filter: added a search input above the sort bar in the infrastructure table, filtering containers by name with a live count indicator (e.g. "5 of 19") when a filter is active.
-- **iter-81** — Container CPU/MEM columns: moved CPU and MEM data from inline bars in the name cell to dedicated right-aligned columns with percentage text and compact progress bars, decluttering the name cell and completing the sort-controls-to-visual-columns loop.
-- **iter-82** — Container table mobile responsiveness: CPU and MEM columns now hide on screens below the sm breakpoint (640px), reducing the table from 5 to 3 visible columns on mobile for easier scrolling without horizontal overflow.
-- **iter-83** — TLS health summary: added a count badge to the TLS certificates card header (e.g. "6/6 OK", "5 OK · 1 expiring", "1 error") for at-a-glance certificate health visibility. Also documented the shared threshold alignment between ContainerTable's resourceBadgeVariant and color-threshold.ts.
-- **iter-84** — TLS threshold constants: extracted hardcoded 14-day and 30-day expiry thresholds from OverviewSection into named constants in color-threshold.ts, eliminating threshold drift between the per-cert badge and the summary badge.
-- **iter-85** — Document title: browser tab now shows the active section ("Overview" / "VPS") and a ⚠ indicator when the backend connection is stale, so users can identify the dashboard tab and its health at a glance among many open tabs.
-- **iter-86** — Connection-lost banner: added a prominent amber alert banner that appears above content when the backend is unreachable, replacing the tiny toolbar-only indicator. Uses role="alert" for screen reader announcement and auto-dismisses when connection restores.
-- **iter-87** — Container table empty state: added a centered "No containers match ..." message when the name filter matches zero containers, replacing the empty table body with clear feedback.
-- **iter-88** — Visibility-aware polling: status poll (5s) and timeAgo tick (1s) now pause when the browser tab is hidden, and immediately refresh when the tab becomes visible again. Saves bandwidth and battery while providing instant freshness on tab switch.
-- **iter-89** — Mobile sidebar focus trap: added `inert` and `aria-hidden` to `<main>` when the sidebar overlay is open on mobile, preventing keyboard focus from escaping behind the backdrop into page content. The `|| undefined` pattern ensures these attributes are absent (not false) when the sidebar is closed, avoiding any impact on desktop keyboard navigation.
-- **iter-90** — Container health tooltip: added hover tooltip to the VPS tab's "{up}/{total} up" badge, exposing the full count text for operators scanning at a glance.
-- **iter-91** — Initial-load error visibility: moved the connection-lost banner above the data conditional so it renders even when the first `/api/status` fetch fails. Previously the user saw loading skeletons indefinitely with no feedback that the backend was unreachable.
-- **iter-92** — Sort button accessibility: added `aria-label` with sort direction ("ascending"/"descending") to container table sort buttons, so screen readers announce both the active column and its direction instead of only the column name.
-- **iter-93** — Container filter clear button: added a × button inside the filter input that appears when text is active, enabling one-click filter reset instead of manual select-all-delete.
-- **iter-94** — Container action loading indicator: Start, Stop, and Restart buttons now show a spinning Loader2 icon while the API call is in flight, giving users clear visual feedback that their action is processing instead of just a disabled button.
-- **iter-95** — Filter Escape shortcut: pressing Escape in the container name filter or log line filter instantly clears the filter text, matching standard filterable-list UX patterns and improving keyboard workflow.
-- **iter-97** — Redundant aria-hidden removal: removed `aria-hidden` from `<main>` when the mobile sidebar is open; `inert` already provides both keyboard focus blocking and accessibility tree exclusion, so the duplicate `aria-hidden` was unnecessary and sent mixed signals to assistive technology.
-- **iter-98** — Mobile container resource summary: added a compact CPU% / MEM% line below each container name on screens below the `sm` breakpoint, so operators on mobile can see per-container resource usage without switching to desktop. The dedicated CPU and MEM columns remain hidden on mobile to avoid table overflow; this line fills the visibility gap.
-- **iter-99** — Badge utility extraction: extracted `resourceBadgeInfo` and `certBadgeVariant` into shared `src/lib/badge-utils.ts`, removed local duplicates from ContainerTable and OverviewSection, and added vitest with 9 unit tests covering both functions.
-- **iter-100** — Log auto-refresh: added a toggle button next to the log filter that polls container logs every 15 seconds while active, with a spinning RefreshCw icon and "Live" label. Auto-refresh clears when the log panel is closed. Eliminates the manual open/close/reopen cycle for monitoring live log output.
-- **iter-101** — Log line count indicator: the log panel now shows a line count ("42 lines" or "42 of 3,847 lines" when filtering), mirroring the container name filter count pattern, and adds `role="log"` for screen reader semantics.
-- **iter-102** — Sidebar down-container badge: the VPS nav item in the sidebar now shows a red count badge (e.g. "2") when containers are down, making the signal visible from any section without switching tabs. Badge includes an aria-label for screen reader announcement.
-- **iter-103** — Log copy button: added a Copy button to the container log toolbar that copies all (filtered) log lines to the clipboard with a brief "Copied!" confirmation. Enables quick sharing of debug output without manual select-all-copy.
-- **iter-104** — Overview VPS navigation link: added a conditional "View details →" button to the Overview VPS card that navigates directly to the VPS section. Only visible when containers are down, matching the existing "Down: ..." guard pattern.
-- **iter-105** — Clipboard copy error feedback: replaced the silent catch block in the log copy handler with a `toast.error()` notification, so users see a "Copy failed" toast when the Clipboard API is unavailable (e.g. non-secure contexts, denied permissions).
+- **Host Fleet & Container Lifecycle Management**:
+  - Live Docker container health and resource tracking (`docker ps`, `docker stats`) reporting container status, memory usage, and CPU percentages.
+  - Safe, allowlisted container control actions: start, stop, and restart containers directly from the UI with real-time feedback.
+  - Read-only live container log inspection with filtering and auto-scroll capabilities.
+- **Caddy & SSL/TLS Certificate Posture**:
+  - Multi-domain SSL/TLS tracking via active TLS handshakes (`/api/ssl`), tracking expiration dates, issuers, and remaining days.
+  - Per-domain inline SSL security status badges on domain cards.
+  - Focus navigation: one-click SSL quick action on any domain card immediately jumps to and highlights that specific domain's certificate.
+  - Certificate posture health assessment in the dedicated Security panel.
+- **Domain Management & Reachability Probing**:
+  - Domain overview card roster (`/api/domains`) displaying mapped services and live HTTP/HTTPS status probe results.
+  - Direct "Visit" links and domain-threaded quick actions (File Manager, Databases, SSL, Backups).
+- **Hardware Telemetry & System Statistics**:
+  - Real-time CPU utilization sampling via Node `os.cpus()` delta measurement.
+  - Memory capacity, usage, and load averages (`os.loadavg()` 1m/5m/15m).
+  - Disk utilization tracking via filesystem interrogation.
+  - Network throughput monitoring and plan bandwidth metrics.
+- **Service Panels & Tool Integrations**:
+  - Dedicated panels for Databases, Git repositories, File Manager, and Backups.
+  - Integrated reverse proxy relay for services like Firecrawl (`firecrawl.shubhbuilds.com`), transparently proxying Bearer token requests before dashboard Basic Auth.
+- **Responsive UX & Keyboard Navigation**:
+  - Clean light/dark mode powered by `next-themes`.
+  - Mobile slide-out drawer with focus trapping and accessibility compliance.
+  - Visibility-aware polling: automatically pauses background API requests when the browser tab is hidden to preserve server and client resources.
+  - Keyboard shortcuts for rapid view switching.
 
-### How the GCP credential is handled
+---
 
-This project blocks service-account key creation at the org level, so the
-dashboard authenticates using a personal OAuth token
-(`gcloud auth application-default login`, `cloud-platform` scope) mounted
-into the container. That's broader access than strictly needed for
-start/stop/status, but was a deliberate choice for a single-user,
-password-protected tool rather than building a second non-public service
-to hold it. Revisit if this ever becomes multi-user or public-facing.
+## Architecture
 
-### How Oracle reaches GCP for live detail
-
-A dedicated `vps-control` SSH key (generated on Oracle VPS, registered in
-GCP's instance metadata for `firecrawl-host` only) plus a narrow sudoers
-rule on the GCP side — `vps-control` can run exactly three fixed read-only
-scripts (`/usr/local/bin/vps-poll-{containers,queue,logs}.sh`) via
-passwordless sudo, nothing else. Not full docker-group access.
-
-## Local dev
+The system is organized into two primary layers: a Node.js backend daemon and a modern Vite/React client.
 
 ```
-cp .env.example .env   # fill in DASHBOARD_PASSWORD
+hermes-dashboard/
+├── src/                    # Node.js backend daemon
+│   ├── server.js           # Express application, routes, and Basic Auth
+│   ├── oracle-status.js    # Docker container health & stats collection
+│   ├── oracle-docker-control.js # Allowlisted container lifecycle actions
+│   ├── oracle-hardware.js  # os module CPU/RAM/loadavg & disk usage
+│   ├── tls-status.js       # TLS socket probes for certificate expiry
+│   ├── ssl.js              # Dedicated SSL certificate endpoint
+│   ├── domains.js          # Domain registry & reachability probes
+│   ├── firecrawl-relay.js  # Dedicated API proxy relay for Firecrawl
+│   ├── traffic.js          # Network bandwidth tracking
+│   └── version.js          # Version & build metadata
+├── web/                    # Frontend SPA
+│   ├── src/
+│   │   ├── components/     # UI components, tables, panels, cards, sidebar
+│   │   ├── hooks/          # React hooks (useStatus, useDomains, useJson)
+│   │   └── lib/            # Navigation structure, badge logic, formatters
+│   ├── package.json        # Vite, React 19, Tailwind CSS v4, Vitest
+│   └── vite.config.ts      # Build and dev server configuration
+├── Dockerfile              # Container definition
+├── docker-compose.yml      # Service orchestration mounting /var/run/docker.sock
+└── package.json            # Root scripts and server dependencies
+```
+
+### Technology Stack
+
+- **Backend**: Node.js (CommonJS), Express 4, `express-basic-auth`, `dotenv`.
+- **Frontend**: React 19, TypeScript, Vite 8, Tailwind CSS v4, `@base-ui/react`, Lucide icons, `sonner`.
+- **Testing & Quality**: Vitest, Playwright, Oxlint.
+- **Proxy / Ingress**: Caddy reverse proxy handling public ingress and automatic TLS termination.
+
+---
+
+## Running the Dashboard
+
+### Prerequisites
+
+- Node.js >= 18
+- Docker daemon (for container metrics and lifecycle control)
+- Host environment credentials in `.env`
+
+### Environment Variables
+
+Create a `.env` file in the root directory (see `.env.example`):
+
+```bash
+PORT=4000
+DASHBOARD_USER=admin
+DASHBOARD_PASSWORD=your_secure_password
+SYSTEM_IP=123.45.67.89
+```
+
+### Port
+
+The Express server listens on port **4000** by default (override via `PORT` in `.env`).
+
+### Scripts (`package.json`)
+
+From the root directory:
+
+```bash
+# Install root dependencies
 npm install
+
+# Install web dependencies and build frontend
+npm --prefix web install
+npm run build
+
+# Start the server (serves API and web/dist static assets on port 4000)
 npm start
+
+# Run frontend tests
+npm test
+
+# Run linter
+npm run lint
+
+# Run full verification script
+npm run verify
 ```
 
-## Deploy
+### Development
 
-Own docker-compose project on Oracle VPS at `/opt/apps/vps-control`, fronted
-by Caddy (see `Caddyfile.snippet`) at `control.shubhbuilds.com`.
+To develop the frontend with Vite hot module replacement (HMR):
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+---
+
+## API Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/status` | Consolidated server health: container stats, hardware usage, TLS summaries, traffic, and subscription info |
+| `GET` | `/api/domains` | Roster of hosted domains with live reachability probe results and inline SSL metadata |
+| `GET` | `/api/ssl` | Dedicated SSL/TLS certificate registry and expiration posture |
+| `POST` | `/api/oracle/containers/:name/:action` | Control allowlisted container (`start`, `stop`, `restart`) |
+| `GET` | `/api/oracle/containers/:name/logs` | Fetch container stdout/stderr logs |
+| `GET` | `/api/databases` | Database services and connection endpoints |
+| `GET` | `/api/git` | Registered deployment Git repositories |
+| `GET` | `/api/files` | File manager storage roots and disk quota |
+| `GET` | `/api/backups` | Scheduled and manual backup snapshots |
+| `GET` | `/api/version` | Current release version and build commit hash |
+
+---
+
+## Docker Deployment
+
+The dashboard can run directly as a Docker container with access to the host Docker socket:
+
+```bash
+docker compose up -d --build
+```
+
+The container exposes port 4000, which should be reverse-proxied behind Caddy or your ingress gateway.
